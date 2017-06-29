@@ -24,9 +24,14 @@ fn main() {
 		let expression = Expression::parse(expression_string.as_str()).unwrap();
 		// read the various files and apply it to them
 		for filename in filenames.iter() {
-			let audio_file = AudioFile::read_file(filename).unwrap();
-			let line = expression.apply(&audio_file);
-			println!("{}", line);
+			let audio_file_result = AudioFile::read_file(filename);
+			match audio_file_result {
+				Ok(audio_file) => {
+					let line = expression.apply(&audio_file);
+					println!("{}", line);
+				},
+				Err(_) => continue,
+			};
 		}
 	}
 }
