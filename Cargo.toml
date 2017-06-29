@@ -1,0 +1,23 @@
+[package]
+name = "titleformat"
+version = "0.1.0"
+authors = ["Victor Nivet <victor@saumon.ninja>"]
+description = "Metadata Title Formatting Library"
+
+[features]
+# default = ["ffmpeg"]
+
+[dependencies]
+ffmpeg = { git = "https://github.com/meh/rust-ffmpeg", rev = "8b4693d04c1960f7d18e6a255c3bd61b0eee180b", optional = true }
+
+[dependencies.regex]
+version = "0.2.2"
+
+[dependencies.nom]
+version = "^3.1"
+features = ["regexp"]
+
+
+[[bin]]
+name = "titleformatter"
+required-features = ["ffmpeg"]
