@@ -26,6 +26,29 @@ impl Expression {
     pub fn parse(string: &str) -> Result<Expression, parser::ParseError> {
         Ok(parser::parse(string)?)
     }
+	pub fn apply(&self, metadata: &MetadataObject) -> String {
+		let (s, _) = self.apply_optional(metadata);
+		s
+	}
+    pub fn definition(&self) -> String {
+        let mut s = String::new();
+		for item in self.items.iter() {
+			match item {
+				&Item::Text(ref text) => s.push_str(text),
+				&Item::Tag(ref text) => {
+						s.push_str("%");
+						s.push_str(text.as_str());
+						s.push_str("%");
+					},
+				&Item::OptionalExpr(ref expr) => {
+					s.push_str("[");
+					s.push_str(expr.definition().as_str());
+					s.push_str("]");
+				},
+			}
+		}
+        s
+    }
 	fn apply_optional(&self, metadata: &MetadataObject) -> (String, u32) {
 		let mut s = String::new();
 		let mut tags_found : u32 = 0; 
@@ -52,27 +75,4 @@ impl Expression {
 		}
 		(s, tags_found)
 	}
-	pub fn apply(&self, metadata: &MetadataObject) -> String {
-		let (s, _) = self.apply_optional(metadata);
-		s
-	}
-    pub fn definition(&self) -> String {
-        let mut s = String::new();
-		for item in self.items.iter() {
-			match item {
-				&Item::Text(ref text) => s.push_str(text),
-				&Item::Tag(ref text) => {
-						s.push_str("%");
-						s.push_str(text.as_str());
-						s.push_str("%");
-					},
-				&Item::OptionalExpr(ref expr) => {
-					s.push_str("[");
-					s.push_str(expr.definition().as_str());
-					s.push_str("]");
-				},
-			}
-		}
-        s
-    }
 }
