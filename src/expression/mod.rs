@@ -26,7 +26,7 @@ impl Expression {
     pub fn parse(string: &str) -> Result<Expression, parser::ParseError> {
         Ok(parser::parse(string)?)
     }
-	pub fn apply(&self, metadata: &MetadataObject) -> String {
+	pub fn apply<T: MetadataObject>(&self, metadata: &T) -> String {
 		let (s, _) = self.apply_optional(metadata);
 		s
 	}
@@ -49,9 +49,9 @@ impl Expression {
 		}
         s
     }
-	fn apply_optional(&self, metadata: &MetadataObject) -> (String, u32) {
+	fn apply_optional<T: MetadataObject>(&self, metadata: &T) -> (String, u32) {
 		let mut s = String::new();
-		let mut tags_found : u32 = 0; 
+		let mut tags_found : u32 = 0;
 		for item in self.items.iter() {
 			match item {
 				&Item::Text(ref text) => s.push_str(text),
