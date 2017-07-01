@@ -1,21 +1,30 @@
-
 use super::metadata::MetadataObject;
-
+/// An item that is a composant of a formatting expression
 pub enum Item {
+	/// Simple text
 	Text(String),
+	/// Metadata tag
+	/// Signified in the definition between % signs: %tag_name%
 	Tag(String),
+	/// Optional sub-expression
+	/// Returns an empty string if none of the tags in the sub-expression was found
+	/// Signified in the definition between square brackets []
     OptionalExpr(Box<Expression>),
 }
-
+/// A formatting expression
 pub struct Expression {
 	items: Vec<Item>,
 }
 
-mod expression_parser;
+/// Parser module
+mod parser;
+/// Tests
+#[cfg(test)]
+mod tests;
 
 impl Expression {
-    pub fn parse(string: &str) -> Result<Expression, expression_parser::ParseError> {
-        Ok(expression_parser::parse(string)?)
+    pub fn parse(string: &str) -> Result<Expression, parser::ParseError> {
+        Ok(parser::parse(string)?)
     }
 	fn apply_optional(&self, metadata: &MetadataObject) -> (String, u32) {
 		let mut s = String::new();
