@@ -1,39 +1,13 @@
 // Parsing tests
-
 use super::*;
 use std::collections::HashMap;
-use super::super::metadata::MetadataObject;
+use super::super::tests::MetadataProvider;
 
-struct MetadataProvider<'a> {
-    metadata_dict: HashMap<&'a str, &'a str>,
-}
-
-impl<'a> MetadataProvider<'a> {
-    fn new(metadata_dict: HashMap<&'a str, &'a str>) -> MetadataProvider<'a> {
-        MetadataProvider {
-            metadata_dict,
-        }
-    }
-}
-
-impl<'a> MetadataObject for MetadataProvider<'a> {
-    fn read_tag(&self, key: &str) -> Option<String> {
-        let entry = self.metadata_dict.get(key);
-        if let Some(value) = entry {
-            let s = value.to_string();
-            Some(s)
-        }
-        else {
-            None
-        }
-    }
-}
-
-fn make_item_text(text: &str) -> Item {
+fn make_item_text(text: &str) -> Item<MetadataProvider> {
     Item::Text(text.to_owned())
 }
 
-fn make_item_tag(tag: &str) -> Item {
+fn make_item_tag(tag: &str) -> Item<MetadataProvider> {
     Item::Tag(tag.to_owned())
 }
 
@@ -53,7 +27,7 @@ fn test_apply_simple_text() {
         MetadataProvider::new(dict)
     };
     let s = expression.apply(&test_metadata);
-    assert_eq!("testhello world", s.as_str());
+    assert_eq!("testhello world", s.to_string().as_str());
 }
 
 #[test]
@@ -74,7 +48,7 @@ fn test_apply_tags() {
             MetadataProvider::new(dict)
         };
         let s = expression.apply(&test_metadata);
-        assert_eq!("test Test Song hello world", s.as_str());
+        assert_eq!("test Test Song hello world", s.to_string().as_str());
     }
     {
         let expression = {
@@ -97,7 +71,7 @@ fn test_apply_tags() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("01. NewArtist - Test Song", s.as_str());
+            assert_eq!("01. NewArtist - Test Song", s.to_string().as_str());
         }
         {
             let test_metadata = {
@@ -107,7 +81,7 @@ fn test_apply_tags() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("01.  - Test Song", s.as_str());
+            assert_eq!("01. ? - Test Song", s.to_string().as_str());
         }
     }
 }
@@ -142,7 +116,7 @@ fn test_apply_optional() {
             MetadataProvider::new(dict)
         };
         let s = expression.apply(&test_metadata);
-        assert_eq!("9. 9th Symphony (Beethoven)", s.as_str());
+        assert_eq!("9. 9th Symphony (Beethoven)", s.to_string().as_str());
     }
     {
         let test_metadata = {
@@ -152,34 +126,6 @@ fn test_apply_optional() {
             MetadataProvider::new(dict)
         };
         let s = expression.apply(&test_metadata);
-        assert_eq!("5. Greensleeves", s.as_str());
-    }
-}
-
-#[test]
-fn test_parser() {
-    {
-        let expression = Expression::parse("%tracknumber%. %title%[ (%composer%)]").unwrap();
-        {
-            let test_metadata = {
-                let mut dict = HashMap::new();
-                dict.insert("tracknumber", "9");
-                dict.insert("title", "9th Symphony");
-                dict.insert("composer", "Beethoven");
-                MetadataProvider::new(dict)
-            };
-            let s = expression.apply(&test_metadata);
-            assert_eq!("9. 9th Symphony (Beethoven)", s.as_str());
-        }
-        {
-            let test_metadata = {
-                let mut dict = HashMap::new();
-                dict.insert("tracknumber", "5");
-                dict.insert("title", "Greensleeves");
-                MetadataProvider::new(dict)
-            };
-            let s = expression.apply(&test_metadata);
-            assert_eq!("5. Greensleeves", s.as_str());
-        }
+        assert_eq!("5. Greensleeves", s.to_string().as_str());
     }
 }

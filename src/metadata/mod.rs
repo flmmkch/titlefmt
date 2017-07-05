@@ -1,7 +1,7 @@
 /// A metadata-providing object
 /// Most likely a single audio file or track
-pub trait MetadataObject {
+pub trait Provider {
 	/// Returns the value of a tag given as parameter
 	/// If there is no such tag in the metada then return None
-	fn read_tag(&self, &str) -> Option<String>;
+	fn tag_value(&self, &str) -> Option<String>;
 }

@@ -8,8 +8,8 @@ pub struct AudioFile {
     pub metadata_dict: HashMap<String, String>,
 }
 
-impl metadata::MetadataObject for AudioFile {
-    fn read_tag(&self, key: &str) -> Option<String> {
+impl metadata::Provider for AudioFile {
+    fn tag_value(&self, key: &str) -> Option<String> {
         let entry = self.metadata_dict.get(key);
         if let Some(value) = entry {
             Some(value.to_owned())

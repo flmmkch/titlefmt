@@ -17,7 +17,6 @@ version = "0.2.2"
 version = "^3.1"
 features = ["regexp"]
 
-
 [[bin]]
 name = "titleformatter"
 required-features = ["ffmpeg"]

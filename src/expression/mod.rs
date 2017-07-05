@@ -1,6 +1,20 @@
-use super::metadata::MetadataObject;
+use super::metadata;
+use super::function;
+use super::value::Value;
+
+/// Tests
+#[cfg(test)]
+mod tests;
+
+/// A formatting expression
+pub struct Expression<'a, T: metadata::Provider>
+	where T: 'a {
+	items: Vec<Item<'a, T>>,
+}
+
 /// An item that is a composant of a formatting expression
-pub enum Item {
+pub enum Item<'a, T: metadata::Provider>
+	where T: 'a {
 	/// Simple text
 	Text(String),
 	/// Metadata tag
@@ -9,25 +23,25 @@ pub enum Item {
 	/// Optional sub-expression
 	/// Returns an empty string if none of the tags in the sub-expression was found
 	/// Signified in the definition between square brackets []
-    OptionalExpr(Box<Expression>),
-}
-/// A formatting expression
-pub struct Expression {
-	items: Vec<Item>,
+    OptionalExpr(Box<Expression<'a, T>>),
+	/// A function call
+	Function(FunctionCall<'a, T>),
 }
 
-/// Parser module
-mod parser;
-/// Tests
-#[cfg(test)]
-mod tests;
+pub struct FunctionCall<'a, T: metadata::Provider>
+	where T: 'a {
+	function: &'a function::Function<T>,
+	arguments: Vec<Box<Expression<'a, T>>>,
+}
 
-impl Expression {
-    pub fn parse(string: &str) -> Result<Expression, parser::ParseError> {
-        Ok(parser::parse(string)?)
-    }
-	pub fn apply<T: MetadataObject>(&self, metadata: &T) -> String {
-		let (s, _) = self.apply_optional(metadata);
+impl<'a, T: metadata::Provider> Expression<'a, T> {
+	pub fn new(items: Vec<Item<'a, T>>) -> Expression<'a, T> {
+		Expression {
+			items: items,
+		}
+	}
+	pub fn apply(&self, metadata_provider: &T) -> Value {
+		let (s, _) = self.apply_optional(metadata_provider);
 		s
 	}
     pub fn definition(&self) -> String {
@@ -45,34 +59,68 @@ impl Expression {
 					s.push_str(expr.definition().as_str());
 					s.push_str("]");
 				},
+				&Item::Function(ref function_call) => {
+					s.push_str("$");
+					s.push_str(function_call.function.name());
+					s.push_str("(");
+					if function_call.arguments.len() > 0 {
+						s.push_str(function_call.arguments[0].definition().as_str());
+					}
+					for arg in function_call.arguments[1..].iter() {
+						s.push_str(arg.definition().as_str());
+					}
+					s.push_str(")");
+				},
 			}
 		}
         s
     }
-	fn apply_optional<T: MetadataObject>(&self, metadata: &T) -> (String, u32) {
-		let mut s = String::new();
+	fn apply_optional(&self, metadata_provider: &T) -> (Value, u32) {
+		let mut v: Vec<Value> = Vec::new();
 		let mut tags_found : u32 = 0;
 		for item in self.items.iter() {
 			match item {
-				&Item::Text(ref text) => s.push_str(text),
+				&Item::Text(ref text) => v.push(Value::Text(text.clone())),
 				&Item::Tag(ref text) => {
-					let result = metadata.read_tag(text.to_lowercase().as_str());
+					let result = metadata_provider.tag_value(text.to_lowercase().as_str());
 					if let Some(result_string) = result {
-						s.push_str(result_string.as_str());
 						if result_string.len() > 0 {
 							tags_found += 1;
+							v.push(Value::Text(result_string));
 						}
+					}
+					else {
+						v.push(Value::Empty);
 					}
 				},
 				&Item::OptionalExpr(ref expr) => {
-					let (expr_s, expr_tag) = expr.apply_optional(metadata);
+					let (expr_v, expr_tag) = expr.apply_optional(metadata_provider);
 					if expr_tag > 0 {
-						s.push_str(expr_s.as_str());
+						v.push(expr_v);
 						tags_found += expr_tag;
+					}
+				},
+				&Item::Function(ref function_call) => {
+					let function_res = function_call.evaluate(metadata_provider);
+					match function_res {
+						Ok(function_v) => v.push(function_v),
+						Err(_) => return (Value::Empty, 0),
 					}
 				},
 			}
 		}
-		(s, tags_found)
+		(Value::concatenate(&v[..]), tags_found)
 	}
+}
+
+impl<'a, T: metadata::Provider> FunctionCall<'a, T> {
+	pub fn new(function: &'a function::Function<T>, arguments: Vec<Box<Expression<'a, T>>>) -> FunctionCall<'a, T> {
+		FunctionCall {
+			function,
+			arguments,
+		}
+	}
+	fn evaluate(&self, metadata_provider: &T) -> Result<Value, function::Error> {
+		self.function.apply(metadata_provider, &self.arguments[..])
+	}	
 }
