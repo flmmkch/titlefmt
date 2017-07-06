@@ -127,19 +127,41 @@ named!(escaped_text<&[u8], building::Item, ParseError>,
     )
 );
 
-fn make_tag_item(string: &str) -> Result<building::Item, ParseError> {
-    Ok(building::Item::Tag(string.to_owned()))
+fn make_tag_item(string: String) -> Result<building::Item, ParseError> {
+    Ok(building::Item::Tag(string))
+}
+
+fn unicode_converter(bytes: &[u8]) -> Result<&str, ParseError> {
+    match str::from_utf8(bytes) {
+        Ok(string) => Ok(string),
+        Err(utf8error) => Err(ParseError::StrUnicodeError(utf8error)),
+    }
 }
 
 named!(item_tag<&[u8], building::Item, ParseError>,
     add_return_error!(
         ErrorKind::Custom(ParseError::NomError),
         map_res!(
-        delimited!(
-            tag!("%"),
-            map_res!(alphanumeric, str::from_utf8),
-            tag!("%")),
-        make_tag_item
+            delimited!(
+                tag!("%"),
+                fold_many1!(
+                    map_res!(
+                        alt!(
+                            alphanumeric |
+                            tag!("_") |
+                            tag!(" ")
+                        ),
+                        unicode_converter
+                    ),
+                    String::new(),
+                    |mut acc: String, string: &str| -> String {
+                        acc.push_str(string);
+                        acc
+                    }
+                ),
+                tag!("%")
+            ),
+            make_tag_item
         )
     )
 );
@@ -179,13 +201,6 @@ named!(item_optional<&[u8], building::Item, ParseError>,
         )
     )
 );
-
-fn unicode_converter(bytes: &[u8]) -> Result<&str, ParseError> {
-    match str::from_utf8(bytes) {
-        Ok(string) => Ok(string),
-        Err(utf8error) => Err(ParseError::StrUnicodeError(utf8error)),
-    }
-}
 
 named!(function_name<&[u8], String, ParseError>,
     fold_many1!(
