@@ -14,3 +14,4 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
 * Functions
   * if2
   * add
+  * div

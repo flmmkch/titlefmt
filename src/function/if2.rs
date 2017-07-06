@@ -15,7 +15,7 @@ fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
 function_object_maker!(if2);
 
 #[test]
-fn test_function_if2()
+fn test_function()
 {
     let formatter = super::super::Formatter::new();
     // tests with functions

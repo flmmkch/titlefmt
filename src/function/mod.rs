@@ -25,6 +25,7 @@ macro_rules! function_object_maker {
 }
 
 mod add;
+mod div;
 mod if2;
 
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
@@ -35,6 +36,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
         }
     }
     add_function!(add);
+    add_function!(div);
     add_function!(if2);
     s
 }
