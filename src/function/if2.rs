@@ -18,3 +18,39 @@ pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
         Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if2(provider, expressions) })
     )
 }
+
+#[test]
+fn test_function_if2()
+{
+    let formatter = super::super::Formatter::new();
+    // tests with functions
+    {
+        let test_metadata = {
+            let mut dict = HashMap::new();
+            dict.insert("tracknumber", "9");
+            dict.insert("title", "9th Symphony");
+            dict.insert("composer", "Beethoven");
+            super::super::tests::MetadataProvider::new(dict)
+        };
+        {
+            let expression = formatter.parser().parse("%tracknumber%. $if2(%composer%, %tracknumber%) - %title%").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("%tracknumber%. $if2(%artist%, %composer%) - %title%").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("%tracknumber%. $if2(%composer%, %artist%) - %title%").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("%tracknumber%. $if2(%albumartist%, %artist%) - %title%").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("9. ? - 9th Symphony", s.to_string().as_str());
+        }
+    }
+}
