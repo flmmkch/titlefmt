@@ -29,8 +29,7 @@ impl<'a> MetadataProvider<'a> {
 fn test_parser() {
     {
         let formatter = Formatter::new();
-        let parser = formatter.parser();
-        let expression = parser.parse("%tracknumber%. %title%[ (%composer%)]").unwrap();
+        let expression = formatter.parser().parse("%tracknumber%. %title%[ (%composer%)]").unwrap();
         {
             let test_metadata = {
                 let mut dict = HashMap::new();

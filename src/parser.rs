@@ -16,7 +16,8 @@ pub enum ParseError {
 
 /// Parsing a string: first parse into intermediate objects (building module)
 /// Then convert into real objects with the context
-pub fn parse<'a, T: metadata::Provider>(string: &str, format_parser: &'a super::FormatParser<T>) -> Result<expression::Expression<'a, T>, ParseError> {
+pub fn parse<'a, 'b, T: metadata::Provider>(string: &str, format_parser: &super::FormatParser<'a, T>) -> Result<expression::Expression<'b, T>, ParseError>
+    where 'a: 'b {
     let result = parse_expression(string.as_bytes());
     match result {
         IResult::Done(_, building_expr) => {
@@ -29,7 +30,8 @@ pub fn parse<'a, T: metadata::Provider>(string: &str, format_parser: &'a super::
 }
 
 /// Build the expression from the building plans that have been parsed, using the formatters' information (such as functions)
-fn build_expression<'a, T: metadata::Provider>(building_expr: building::Expression, format_parser: &'a super::FormatParser<T>) -> Result<expression::Expression<'a, T>, ParseError> {
+fn build_expression<'a, 'b, T: metadata::Provider>(building_expr: building::Expression, format_parser: &super::FormatParser<'a, T>) -> Result<expression::Expression<'b, T>, ParseError>
+    where 'a: 'b {
     let mut real_items = Vec::new();
     for building_item in building_expr.items {
         let s : expression::Item<T> = {
