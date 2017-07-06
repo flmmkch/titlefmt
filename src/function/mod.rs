@@ -24,11 +24,18 @@ macro_rules! function_object_maker {
     }
 }
 
+mod add;
 mod if2;
 
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     let mut s = Vec::new();
-    s.push(Box::new(if2::make_function_object::<T>()));
+    macro_rules! add_function {
+        ($func_name: ident) => {
+            s.push(Box::new($func_name::make_function_object::<T>()));
+        }
+    }
+    add_function!(add);
+    add_function!(if2);
     s
 }
 
