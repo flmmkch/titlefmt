@@ -8,6 +8,7 @@ pub mod ffmpeg_audio;
 /// Values module
 pub mod value;
 /// Functions module
+#[macro_use]
 pub mod function;
 
 mod parser;

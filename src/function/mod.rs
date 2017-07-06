@@ -12,6 +12,18 @@ pub struct Function<T: metadata::Provider> {
     name: String,
 }
 
+#[macro_export]
+macro_rules! function_object_maker {
+    ($func_name: ident) => {
+        pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
+            Function::new(
+                stringify!($func_name),
+                Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { $func_name(provider, expressions) })
+            )
+        }
+    }
+}
+
 mod if2;
 
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {

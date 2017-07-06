@@ -12,12 +12,7 @@ fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
     }
 }
 
-pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
-    Function::new(
-        "if2",
-        Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if2(provider, expressions) })
-    )
-}
+function_object_maker!(if2);
 
 #[test]
 fn test_function_if2()
