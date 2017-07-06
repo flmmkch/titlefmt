@@ -3,7 +3,7 @@ use super::value::Value;
 
 fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
     if expressions.len() != 2 {
-        return Err(Error::TypeError);
+        return Err(Error::ArgumentError);
     }
     let expr_value = expressions[0].apply(provider);
     match expr_value {
