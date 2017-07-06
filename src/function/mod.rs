@@ -1,5 +1,7 @@
 use super::*;
 
+use num;
+
 pub enum Error {
     ArgumentError,
     TypeError,
@@ -26,6 +28,14 @@ macro_rules! function_object_maker {
 
 mod add;
 mod div;
+mod greater;
+mod max;
+mod min;
+mod mod_;
+mod mul;
+mod muldiv;
+mod sub;
+mod if_;
 mod if2;
 
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
@@ -37,6 +47,14 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     }
     add_function!(add);
     add_function!(div);
+    add_function!(greater);
+    add_function!(max);
+    add_function!(min);
+    s.push(Box::new(mod_::make_function_object::<T>()));
+    add_function!(mul);
+    add_function!(muldiv);
+    add_function!(sub);
+    s.push(Box::new(if_::make_function_object::<T>()));
     add_function!(if2);
     s
 }
@@ -53,5 +71,20 @@ impl<T: metadata::Provider> Function<T> {
     }
     pub fn name(&self) -> &str {
         self.name.as_str()
+    }
+}
+
+fn expect_result<V, T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> Result<V, Error>
+    where V: std::str::FromStr + num::FromPrimitive {
+    match expr.apply(provider) {
+        super::value::Value::Integer(term) => Ok(V::from_i32(term).unwrap()),
+        super::value::Value::Double(term) => Ok(V::from_f64(term).unwrap()),
+        super::value::Value::Text(s) => {
+            match s.parse::<V>() {
+                Ok(term) => Ok(term),
+                _ => return Err(Error::TypeError),
+            }
+        }
+        _ => return Err(Error::TypeError),
     }
 }

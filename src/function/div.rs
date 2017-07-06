@@ -35,7 +35,6 @@ fn div<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
 
 function_object_maker!(div);
 
-
 #[test]
 fn test_function()
 {

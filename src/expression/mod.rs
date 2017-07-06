@@ -41,10 +41,10 @@ impl<'a, T: metadata::Provider> Expression<'a, T> {
 		}
 	}
 	pub fn apply(&self, metadata_provider: &T) -> Value {
-		let (s, _) = self.apply_optional(metadata_provider);
+		let (s, _) = self.apply_valued(metadata_provider);
 		s
 	}
-	fn apply_optional(&self, metadata_provider: &T) -> (Value, u32) {
+	pub fn apply_valued(&self, metadata_provider: &T) -> (Value, u32) {
 		let mut v: Vec<Value> = Vec::new();
 		let mut tags_found : u32 = 0;
 		for item in self.items.iter() {
@@ -63,7 +63,7 @@ impl<'a, T: metadata::Provider> Expression<'a, T> {
 					}
 				},
 				&Item::OptionalExpr(ref expr) => {
-					let (expr_v, expr_tag) = expr.apply_optional(metadata_provider);
+					let (expr_v, expr_tag) = expr.apply_valued(metadata_provider);
 					if expr_tag > 0 {
 						v.push(expr_v);
 						tags_found += expr_tag;

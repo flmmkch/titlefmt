@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate nom;
+extern crate num;
 pub mod metadata;
 pub mod expression;
 #[cfg(feature = "ffmpeg")]

@@ -9,6 +9,7 @@ description = "Metadata Title Formatting Library"
 
 [dependencies]
 ffmpeg = { git = "https://github.com/meh/rust-ffmpeg", rev = "8b4693d04c1960f7d18e6a255c3bd61b0eee180b", optional = true }
+num = "0.1"
 
 [dependencies.regex]
 version = "0.2.2"
