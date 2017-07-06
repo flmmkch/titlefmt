@@ -13,8 +13,8 @@ fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
 }
 
 pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
-    Function {
-        closure: Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if2(provider, expressions) }),
-        name: "IF2".to_owned(),
-    }
+    Function::new(
+        "if2",
+        Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if2(provider, expressions) })
+    )
 }

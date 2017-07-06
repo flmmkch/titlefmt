@@ -21,10 +21,16 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
 }
 
 impl<T: metadata::Provider> Function<T> {
+    pub fn new(name_param: &str, closure: Box<FunctionClosure<T>>) -> Function<T> {
+        Function {
+            closure,
+            name: name_param.to_lowercase(),
+        }
+    }
     pub fn apply(&self, provider: &T, arguments: &[Box<expression::Expression<T>>]) -> Result<value::Value, Error> {
         (self.closure)(&provider, &arguments)
     }
-    pub fn name(&self, ) -> &str {
+    pub fn name(&self) -> &str {
         self.name.as_str()
     }
 }
