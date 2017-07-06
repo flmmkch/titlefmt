@@ -44,37 +44,6 @@ impl<'a, T: metadata::Provider> Expression<'a, T> {
 		let (s, _) = self.apply_optional(metadata_provider);
 		s
 	}
-    pub fn definition(&self) -> String {
-        let mut s = String::new();
-		for item in self.items.iter() {
-			match item {
-				&Item::Text(ref text) => s.push_str(text),
-				&Item::Tag(ref text) => {
-						s.push_str("%");
-						s.push_str(text.as_str());
-						s.push_str("%");
-					},
-				&Item::OptionalExpr(ref expr) => {
-					s.push_str("[");
-					s.push_str(expr.definition().as_str());
-					s.push_str("]");
-				},
-				&Item::Function(ref function_call) => {
-					s.push_str("$");
-					s.push_str(function_call.function.name());
-					s.push_str("(");
-					if function_call.arguments.len() > 0 {
-						s.push_str(function_call.arguments[0].definition().as_str());
-					}
-					for arg in function_call.arguments[1..].iter() {
-						s.push_str(arg.definition().as_str());
-					}
-					s.push_str(")");
-				},
-			}
-		}
-        s
-    }
 	fn apply_optional(&self, metadata_provider: &T) -> (Value, u32) {
 		let mut v: Vec<Value> = Vec::new();
 		let mut tags_found : u32 = 0;
