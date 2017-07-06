@@ -1,4 +1,4 @@
-use nom::{IResult, alphanumeric, is_alphanumeric, is_space};
+use nom::{IResult, alphanumeric, is_space};
 use std::str;
 use std::string;
 use nom::ErrorKind;
@@ -180,16 +180,26 @@ named!(item_optional<&[u8], building::Item, ParseError>,
     )
 );
 
+fn unicode_converter(bytes: &[u8]) -> Result<&str, ParseError> {
+    match str::from_utf8(bytes) {
+        Ok(string) => Ok(string),
+        Err(utf8error) => Err(ParseError::StrUnicodeError(utf8error)),
+    }
+}
+
 named!(function_name<&[u8], String, ParseError>,
-    map_res!(
-        take_while1!(
-            is_alphanumeric
+    fold_many1!(
+        map_res!(
+            alt!(
+                alphanumeric |
+                tag!("_")
+            ),
+            unicode_converter
         ),
-        |bytes: &[u8]| -> Result<String, ParseError> {
-            match str::from_utf8(bytes) {
-                Ok(string) => Ok(String::from(string)),
-                Err(utf8error) => Err(ParseError::StrUnicodeError(utf8error)),
-            }
+        String::new(),
+        |mut acc: String, string: &str| -> String {
+            acc.push_str(string);
+            acc
         }
     )
 );
