@@ -13,3 +13,4 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
 * Conditional selection with square brackets [ ] for optional sub-expressions
 * Functions
   * if2
+  * add
