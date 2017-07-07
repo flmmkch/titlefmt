@@ -4,10 +4,12 @@ use std::path::Path;
 
 extern crate ffmpeg;
 
+/// Metadata for an audio file that has been read through FFMpeg.
 pub struct AudioFile {
-    pub metadata_dict: HashMap<String, String>,
+    metadata_dict: HashMap<String, String>,
 }
 
+/// Trait implementation for providing metadata.
 impl metadata::Provider for AudioFile {
     fn tag_value(&self, key: &str) -> Option<String> {
         let entry = self.metadata_dict.get(key);
@@ -20,14 +22,19 @@ impl metadata::Provider for AudioFile {
     }
 }
 
+/// Error encountered when reading an audio file through FFmpeg.
 #[derive(Debug)]
 pub enum AudioFileReadingError {
+    /// No file was found.
     NoFile,
+    /// The file could not be read as an audio file.
     NotAudioFile,
+    /// Other ffmpeg opening error.
     OpeningError(ffmpeg::Error),
 }
 
 impl AudioFile {
+    /// Read a file from a given filename.
     pub fn read_file(filename: &str) -> Result<AudioFile, AudioFileReadingError> {
         let path = Path::new(filename);
         if !path.exists() {

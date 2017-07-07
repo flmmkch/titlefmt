@@ -1,5 +1,6 @@
 use std::fmt;
 
+/// A value returned by the complete or partial evaluation of a title formatting expression.
 #[derive(Clone)]
 pub enum Value {
 	Text(String),
@@ -22,6 +23,7 @@ impl fmt::Display for Value {
 }
 
 impl Value {
+	/// Concatenate an array of values into one.
 	pub fn concatenate(values: &[Value]) -> Value {
 		match values.len() {
 			0 => Value::Empty,

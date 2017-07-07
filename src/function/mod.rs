@@ -2,19 +2,23 @@ use super::*;
 
 use num;
 
+/// Error encountered when applying a function.
 pub enum Error {
     ArgumentError,
     TypeError,
 }
 
+/// Generic type for function trait objects.
 pub type FunctionClosure<T> = Fn(&T, &[Box<expression::Expression<T>>]) -> Result<value::Value, Error>;
 
+/// Definition of a function that can be used in expressions.
 pub struct Function<T: metadata::Provider> {
+    /// Closure used for applying the function.
     closure: Box<FunctionClosure<T>>,
+    /// Name of the function.
     name: String,
 }
 
-#[macro_export]
 macro_rules! function_object_maker {
     ($func_name: ident) => {
         pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
@@ -38,6 +42,7 @@ mod sub;
 mod if_;
 mod if2;
 
+/// Initialize a list of the standard functions defined in title formatting.
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     let mut s = Vec::new();
     macro_rules! add_function {
