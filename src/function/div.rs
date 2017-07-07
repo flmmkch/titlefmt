@@ -6,17 +6,7 @@ fn div<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
         return Err(Error::ArgumentError);
     }
     // get the first argument
-    let mut result : i32 = match expressions[0].apply(provider) {
-        Value::Integer(term) => term,
-        Value::Double(term) => term as i32,
-        Value::Text(s) => {
-            match s.parse::<i32>() {
-                Ok(term) => term,
-                _ => return Err(Error::TypeError),
-            }
-        }
-        _ => return Err(Error::TypeError),
-    };
+    let mut result : i32 = expect_integer_result::<i32, T>(&expressions[0], provider)?;
     for expr in expressions[1..].iter() {
         match expr.apply(provider) {
             Value::Integer(term) => result /= term,

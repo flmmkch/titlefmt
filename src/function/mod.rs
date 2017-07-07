@@ -74,17 +74,27 @@ impl<T: metadata::Provider> Function<T> {
     }
 }
 
-fn expect_result<V, T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> Result<V, Error>
+fn expect_integer_result<V, T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> Result<V, Error>
     where V: std::str::FromStr + num::FromPrimitive {
     match expr.apply(provider) {
-        super::value::Value::Integer(term) => Ok(V::from_i32(term).unwrap()),
-        super::value::Value::Double(term) => Ok(V::from_f64(term).unwrap()),
+        super::value::Value::Integer(term) => {
+            match V::from_i32(term) {
+                Some(v) => Ok(v),
+                _ => Err(Error::TypeError),
+            }
+        },
+        super::value::Value::Double(term) => {
+            match V::from_f64(term) {
+                Some(v) => Ok(v),
+                _ => Err(Error::TypeError),
+            }
+        },
         super::value::Value::Text(s) => {
             match s.parse::<V>() {
                 Ok(term) => Ok(term),
-                _ => return Err(Error::TypeError),
+                _ => Err(Error::TypeError),
             }
         }
-        _ => return Err(Error::TypeError),
+        _ => Err(Error::TypeError),
     }
 }

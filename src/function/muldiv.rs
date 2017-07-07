@@ -6,9 +6,9 @@ fn muldiv<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Ex
         return Err(Error::ArgumentError);
     }
     // get the first argument
-    let a = expect_result::<i32, T>(&expressions[0], provider)?;
-    let b = expect_result::<i32, T>(&expressions[1], provider)?;
-    let c = expect_result::<i32, T>(&expressions[2], provider)?;
+    let a = expect_integer_result::<i32, T>(&expressions[0], provider)?;
+    let b = expect_integer_result::<i32, T>(&expressions[1], provider)?;
+    let c = expect_integer_result::<i32, T>(&expressions[2], provider)?;
     Ok(Value::Integer((a * b) / c))
 }
 

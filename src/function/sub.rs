@@ -6,7 +6,7 @@ fn sub<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
         return Err(Error::ArgumentError);
     }
     // get the first argument
-    let mut result : i32 = expect_result::<i32, T>(&expressions[0], provider)?;
+    let mut result : i32 = expect_integer_result::<i32, T>(&expressions[0], provider)?;
     for expr in expressions[1..].iter() {
         match expr.apply(provider) {
             Value::Integer(term) => result -= term,

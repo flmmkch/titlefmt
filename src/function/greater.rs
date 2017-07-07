@@ -5,20 +5,10 @@ fn greater<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::E
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
-    let mut values : [i32; 2] = [0, 0];
-    for i in 0..2 {
-        match expressions[i].apply(provider) {
-            Value::Integer(term) => values[i] = term,
-            Value::Double(term) => values[i] = term as i32,
-            Value::Text(s) => {
-                match s.parse::<i32>() {
-                    Ok(term) => values[i] = term,
-                    _ => return Err(Error::TypeError),
-                }
-            }
-            _ => return Err(Error::TypeError),
-        }
-    }
+    let values : [i32; 2] = [
+        expect_integer_result::<i32, T>(&expressions[0], provider)?,
+        expect_integer_result::<i32, T>(&expressions[1], provider)?,
+    ];
     Ok(Value::Boolean(values[0] > values[1]))
 }
 
