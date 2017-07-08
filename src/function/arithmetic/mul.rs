@@ -1,23 +1,17 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation, Value };
 
-fn mul<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn mul<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     let mut result : i32 = 1;
+    let mut truth = false;
     for expr in expressions.iter() {
-        match expr.apply(provider) {
-            Value::Integer(term) => result *= term,
-            Value::Double(term) => result *= term as i32,
-            Value::Text(s) => {
-                match s.parse::<i32>() {
-                    Ok(term) => result *= term,
-                    _ => (),
-                }
-            }
-            _ => (),
+        if let Some((i, expr_truth)) = try_integer_result!(expr, provider) {
+            truth |= expr_truth;
+            result *= i;
         }
     }
-    Ok(Value::Integer(result))
+    Ok(Evaluation::new(Value::Integer(result), truth))
 }
 
 function_object_maker!(mul);

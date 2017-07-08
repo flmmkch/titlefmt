@@ -1,14 +1,14 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation, Value };
 
-fn xor<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn xor<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     /// XOR operation:
     /// test if an odd number of arguments evaluate to true
     /// to achieve that: filter out the false expressions and count the remaining (true) expressions
-    let result : usize = expressions.iter().filter(|&expr| { expect_bool_result(&expr, provider) }).count();
+    let result : usize = expressions.iter().filter(|&expr| { expr.apply(provider).truth() }).count();
     let is_odd : bool = result % 2 == 1;
-    Ok(Value::Boolean(is_odd))
+    Ok(Evaluation::new(Value::Empty, is_odd))
 }
 
 function_object_maker!(xor);

@@ -1,15 +1,15 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation };
 
-fn if3<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn if3<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() == 0 {
         return Err(Error::ArgumentError);
     }
     for expr in &expressions[..expressions.len() - 1] {
-        match expr.apply_valued(provider) {
-            (Value::Empty, _) | (Value::Boolean(false), _) | (Value::Text(_), 0) => continue,
-            (expr_value, _) => return Ok(expr_value),
+        let eval = expr.apply(provider);
+        if eval.truth() {
+            return Ok(eval);
         }
     }
     // else

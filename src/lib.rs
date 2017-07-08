@@ -65,7 +65,6 @@
 
 #[macro_use]
 extern crate nom;
-extern crate num;
 /// Metadata provider trait module.
 pub mod metadata;
 /// Expression module.
@@ -77,6 +76,7 @@ pub mod ffmpeg_audio;
 /// Values module.
 pub mod value;
 /// Functions module.
+#[macro_use]
 pub mod function;
 /// Parser module
 mod parser;

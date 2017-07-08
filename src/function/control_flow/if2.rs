@@ -1,14 +1,17 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation };
 
-fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn if2<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
-    match expressions[0].apply_valued(provider) {
-        (Value::Empty, _) | (Value::Boolean(false), _) | (Value::Text(_), 0) => Ok(expressions[1].apply(provider)),
-        (expr_value, _) => Ok(expr_value),
+    let eval = expressions[0].apply(provider);
+    if eval.truth() {
+        Ok(eval)
+    }
+    else {
+        Ok(expressions[1].apply(provider))
     }
 }
 

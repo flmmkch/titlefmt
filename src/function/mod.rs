@@ -1,9 +1,5 @@
 use super::*;
 
-use num;
-
-use super::value::Value;
-
 /// Error encountered when applying a function.
 pub enum Error {
     ArgumentError,
@@ -11,7 +7,7 @@ pub enum Error {
 }
 
 /// Generic type for function trait objects.
-pub type FunctionClosure<T> = Fn(&T, &[Box<expression::Expression<T>>]) -> Result<value::Value, Error>;
+pub type FunctionClosure<T> = Fn(&[Box<expression::Expression<T>>], &T) -> Result<value::Evaluation, Error>;
 
 /// Definition of a function that can be used in expressions.
 pub struct Function<T: metadata::Provider> {
@@ -26,11 +22,66 @@ macro_rules! function_object_maker {
         pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
             Function::new(
                 stringify!($func_name),
-                Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { $func_name(provider, expressions) })
+                Box::new(|expressions: &[Box<expression::Expression<T>>], provider: &T| -> Result<Evaluation, Error> { $func_name(expressions, provider) })
             )
         }
     }
 }
+
+#[macro_export]
+macro_rules! try_integer_result {
+    ($expression: expr, $provider: expr, $type: ty) => (
+        {
+            let eval = $expression.apply($provider);
+            let i_opt : Option<$type> = {
+                match eval.value() {
+                    &Value::Integer(term) => Some(term as $type),
+                    &Value::Double(term) => Some(term as $type),
+                    &Value::Text(ref s) => {
+                        match s.parse::<$type>() {
+                            Ok(term) => Some(term),
+                            _ => None,
+                        }
+                    }
+                    _ => None,
+                }
+            };
+            if let Some(i) = i_opt {
+                Some((i, eval.truth()))
+            }
+            else {
+                None
+            }
+        }
+    );
+    ($expression: expr, $provider: expr) => (
+        try_integer_result!($expression, $provider, i32)
+    );
+}
+
+#[macro_export]
+macro_rules! expect_integer_result {
+    ($expression: expr, $provider: expr, $type: ty) => (
+        match try_integer_result!($expression, $provider, $type) {
+            Some(eval) => eval,
+            None => return Err(Error::TypeError),
+        }
+    );
+    ($expression: expr, $provider: expr) => (
+        expect_integer_result!($expression, $provider, i32)
+    );
+}
+
+#[macro_export]
+macro_rules! expect_string_result {
+    ($expression: expr, $provider: expr) => (
+        {
+            let eval = $expression.apply($provider);
+            (eval.to_string(), eval.truth())
+        }
+    );
+}
+
 
 /// Arithmetic functions
 mod arithmetic;
@@ -83,52 +134,10 @@ impl<T: metadata::Provider> Function<T> {
             name: name_param.to_lowercase(),
         }
     }
-    pub fn apply(&self, provider: &T, arguments: &[Box<expression::Expression<T>>]) -> Result<value::Value, Error> {
-        (self.closure)(&provider, &arguments)
+    pub fn apply(&self, arguments: &[Box<expression::Expression<T>>], provider: &T) -> Result<value::Evaluation, Error> {
+        (self.closure)(&arguments, &provider)
     }
     pub fn name(&self) -> &str {
         self.name.as_str()
-    }
-}
-
-fn expect_integer_result<V, T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> Result<V, Error>
-    where V: std::str::FromStr + num::FromPrimitive {
-    match expr.apply(provider) {
-        Value::Integer(term) => {
-            match V::from_i32(term) {
-                Some(v) => Ok(v),
-                _ => Err(Error::TypeError),
-            }
-        },
-        Value::Double(term) => {
-            match V::from_f64(term) {
-                Some(v) => Ok(v),
-                _ => Err(Error::TypeError),
-            }
-        },
-        Value::Text(s) => {
-            match s.parse::<V>() {
-                Ok(term) => Ok(term),
-                _ => Err(Error::TypeError),
-            }
-        }
-        _ => Err(Error::TypeError),
-    }
-}
-
-fn expect_bool_result<T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> bool {
-    match expr.apply_valued(provider) {
-        (Value::Empty, _) | (Value::Boolean(false), _) | (_, 0) => false,
-        _ => true,
-    }
-}
-
-fn expect_string_result<T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> String {
-    match expr.apply(provider) {
-        Value::Text(s) => s,
-        Value::Integer(i) => i.to_string(),
-        Value::Double(d) => d.to_string(),
-        Value::Boolean(_) => String::new(),
-        Value::Empty => "?".to_owned(),
     }
 }

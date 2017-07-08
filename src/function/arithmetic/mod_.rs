@@ -1,33 +1,27 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation, Value };
 
-fn mod_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn mod_<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() < 2 {
         return Err(Error::ArgumentError);
     }
     // get the first argument
-    let mut result = expect_integer_result::<i32, T>(&expressions[0], provider)?;
+    let (mut result, mut truth) = expect_integer_result!(&expressions[0], provider);
+    // use the modulo operator on the subsequent arguments
     for expr in expressions[1..].iter() {
-        match expr.apply(provider) {
-            Value::Integer(term) => result %= term,
-            Value::Double(term) => result %= term as i32,
-            Value::Text(s) => {
-                match s.parse::<i32>() {
-                    Ok(term) => result %= term,
-                    _ => (),
-                }
-            }
-            _ => (),
+        if let Some((i, expr_truth)) = try_integer_result!(expr, provider) {
+            truth |= expr_truth;
+            result %= i;
         }
     }
-    Ok(Value::Integer(result))
+    Ok(Evaluation::new(Value::Integer(result), truth))
 }
 
 pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
     Function::new(
         "mod",
-        Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { mod_(provider, expressions) })
+        Box::new(|expressions: &[Box<expression::Expression<T>>], provider: &T| -> Result<Evaluation, Error> { mod_(expressions, provider) })
     )
 }
 

@@ -1,6 +1,6 @@
 use super::metadata;
 use super::function;
-use super::value::Value;
+use super::value::{ Evaluation, Value };
 
 /// Tests.
 #[cfg(test)]
@@ -45,45 +45,45 @@ impl<'a, T: metadata::Provider> Expression<'a, T> {
 			items: items,
 		}
 	}
-	pub fn apply(&self, metadata_provider: &T) -> Value {
-		let (s, _) = self.apply_valued(metadata_provider);
-		s
-	}
-	pub fn apply_valued(&self, metadata_provider: &T) -> (Value, u32) {
-		let mut v: Vec<Value> = Vec::new();
-		let mut tags_found : u32 = 0;
+	pub fn apply(&self, metadata_provider: &T) -> Evaluation {
+		let mut v: Vec<Evaluation> = Vec::new();
 		for item in self.items.iter() {
-			match item {
-				&Item::Text(ref text) => v.push(Value::Text(text.clone())),
-				&Item::Tag(ref text) => {
-					let result = metadata_provider.tag_value(text.to_lowercase().as_str());
-					if let Some(result_string) = result {
-						if result_string.len() > 0 {
-							tags_found += 1;
-							v.push(Value::Text(result_string));
+			let evaluation : Evaluation = {
+				match item {
+					&Item::Text(ref text) => {
+						let result_text = text.clone();
+						// for plain text: the truth value is false
+						Evaluation::new(Value::Text(result_text), false)
+					},
+					&Item::Tag(ref text) => {
+						// check the tag in lowercase
+						let tag_result = metadata_provider.tag_value(text.to_lowercase().as_str());
+						if let Some(result_string) = tag_result {
+							Evaluation::new(Value::Text(result_string), true)
 						}
-					}
-					else {
-						v.push(Value::Empty);
-					}
-				},
-				&Item::OptionalExpr(ref expr) => {
-					let (expr_v, expr_tag) = expr.apply_valued(metadata_provider);
-					if expr_tag > 0 {
-						v.push(expr_v);
-						tags_found += expr_tag;
-					}
-				},
-				&Item::Function(ref function_call) => {
-					let function_res = function_call.evaluate(metadata_provider);
-					match function_res {
-						Ok(function_v) => v.push(function_v),
-						Err(_) => return (Value::Empty, 0),
-					}
-				},
-			}
+						else {
+							Evaluation::new(Value::Unknown, false)
+						}
+					},
+					&Item::OptionalExpr(ref expr) => {
+						let expr_result = expr.apply(metadata_provider);
+						match expr_result.truth() {
+							true => expr_result,
+							false => Evaluation::new(Value::Empty, false)
+						}
+					},
+					&Item::Function(ref function_call) => {
+						let function_res = function_call.evaluate(metadata_provider);
+						match function_res {
+							Ok(function_eval) => function_eval,
+							Err(_) => Evaluation::new(Value::Empty, false),
+						}
+					},
+				}
+			};
+			v.push(evaluation);
 		}
-		(Value::concatenate(&v[..]), tags_found)
+		Evaluation::concatenate(&v[..])
 	}
 }
 
@@ -94,7 +94,7 @@ impl<'a, T: metadata::Provider> FunctionCall<'a, T> {
 			arguments,
 		}
 	}
-	fn evaluate(&self, metadata_provider: &T) -> Result<Value, function::Error> {
-		self.function.apply(metadata_provider, &self.arguments[..])
+	fn evaluate(&self, metadata_provider: &T) -> Result<Evaluation, function::Error> {
+		self.function.apply(&self.arguments[..], metadata_provider)
 	}	
 }

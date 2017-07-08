@@ -1,29 +1,29 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation, Value };
 
-fn if_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn if_<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     match expressions.len() {
         2 | 3 => (),
         _ => return Err(Error::ArgumentError),
     }
-    let (expr_value, s) = expressions[0].apply_valued(provider);
-    match (expr_value, s) {
-        (Value::Empty, _) | (Value::Boolean(false), _) | (Value::Text(_), 0) => {
-            match expressions.len() {
-                2 => Ok(Value::Boolean(false)),
-                3 => Ok(expressions[2].apply(provider)),
-                _ => Err(Error::ArgumentError),
-            }
+    let eval = expressions[0].apply(provider);
+    if eval.truth() {
+        Ok(expressions[1].apply(provider))
+    }
+    else {
+        match expressions.len() {
+            2 => Ok(Evaluation::new(Value::Empty, false)),
+            3 => Ok(expressions[2].apply(provider)),
+            _ => Err(Error::ArgumentError),
         }
-        _ => Ok(expressions[1].apply(provider)),
     }
 }
 
 pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
     Function::new(
         "if",
-        Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if_(provider, expressions) })
+        Box::new(|expressions: &[Box<expression::Expression<T>>], provider: &T| -> Result<Evaluation, Error> { if_(expressions, provider) })
     )
 }
 

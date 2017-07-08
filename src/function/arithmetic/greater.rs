@@ -1,16 +1,17 @@
 use super::super::*;
 use super::super::function::Function;
-use super::super::value::Value;
+use super::super::value::{ Evaluation, Value };
 
-fn greater<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
+fn greater<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
-    let values : [i32; 2] = [
-        expect_integer_result::<i32, T>(&expressions[0], provider)?,
-        expect_integer_result::<i32, T>(&expressions[1], provider)?,
-    ];
-    Ok(Value::Boolean(values[0] > values[1]))
+    let mut values : [i32; 2] = [0, 0];
+    for i in 0..values.len() {
+        let (val, _) = expect_integer_result!(&expressions[i], provider);
+        values[i] = val;
+    }
+    Ok(Evaluation::new(Value::Empty, values[0] > values[1]))
 }
 
 function_object_maker!(greater);
