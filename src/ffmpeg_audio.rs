@@ -50,6 +50,9 @@ impl AudioFile {
                         let codec = stream.codec();
                         if codec.medium() == ffmpeg::media::Type::Audio {
                             is_audio_stream = true;
+                            for (k, v) in stream.metadata().iter() {
+                                metadata_dict.insert(k.to_lowercase(), v.to_owned());
+                            }
                         }
                     }
                     if !is_audio_stream {
