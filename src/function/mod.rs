@@ -68,6 +68,11 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     // control flow functions
     s.push(Box::new(if_::make_function_object::<T>()));
     add_function!(if2);
+    add_function!(if3);
+    add_function!(ifequal);
+    add_function!(ifgreater);
+    add_function!(iflonger);
+    add_function!(select);
     s
 }
 
@@ -115,5 +120,15 @@ fn expect_bool_result<T: metadata::Provider>(expr: &expression::Expression<T>, p
     match expr.apply_valued(provider) {
         (Value::Empty, _) | (Value::Boolean(false), _) | (_, 0) => false,
         _ => true,
+    }
+}
+
+fn expect_string_result<T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> String {
+    match expr.apply(provider) {
+        Value::Text(s) => s,
+        Value::Integer(i) => i.to_string(),
+        Value::Double(d) => d.to_string(),
+        Value::Boolean(_) => String::new(),
+        Value::Empty => "?".to_owned(),
     }
 }

@@ -6,10 +6,9 @@ fn if2<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
-    let expr_value = expressions[0].apply(provider);
-    match expr_value {
-        Value::Empty | Value::Boolean(false) => Ok(expressions[1].apply(provider)),
-        _ => Ok(expr_value),
+    match expressions[0].apply_valued(provider) {
+        (Value::Empty, _) | (Value::Boolean(false), _) | (Value::Text(_), 0) => Ok(expressions[1].apply(provider)),
+        (expr_value, _) => Ok(expr_value),
     }
 }
 

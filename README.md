@@ -27,3 +27,8 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * xor
   * if
   * if2
+  * if3
+  * ifequal
+  * ifgreater
+  * iflonger
+  * select
