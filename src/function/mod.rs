@@ -92,6 +92,9 @@ use self::logical::*;
 /// Control flow functions
 mod control_flow;
 use self::control_flow::*;
+// String functions
+mod string;
+use self::string::*;
 
 /// Initialize a list of the standard functions defined in title formatting.
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
@@ -124,6 +127,8 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(ifgreater);
     add_function!(iflonger);
     add_function!(select);
+    // string functions
+    add_function!(cut);
     s
 }
 
