@@ -21,5 +21,9 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * mul
   * muldiv
   * sub
+  * and
+  * or
+  * not
+  * xor
   * if
   * if2

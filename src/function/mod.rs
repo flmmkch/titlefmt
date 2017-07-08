@@ -2,6 +2,8 @@ use super::*;
 
 use num;
 
+use super::value::Value;
+
 /// Error encountered when applying a function.
 pub enum Error {
     ArgumentError,
@@ -30,16 +32,38 @@ macro_rules! function_object_maker {
     }
 }
 
+/// Arithmetic functions
+/// Addition
 mod add;
+/// Division
 mod div;
+/// Greater than
 mod greater;
+/// Maximum
 mod max;
+/// Minimum
 mod min;
+/// Modulo
 mod mod_;
+/// Multiplication
 mod mul;
+/// Multiplication then division
 mod muldiv;
+/// Substraction
 mod sub;
+/// Boolean functions
+/// Logical and
+mod and;
+/// Logical or
+mod or;
+/// Logical not
+mod not;
+/// Logical exclusive or
+mod xor;
+/// Control flow functions
+/// If
 mod if_;
+/// If2
 mod if2;
 
 /// Initialize a list of the standard functions defined in title formatting.
@@ -50,6 +74,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
             s.push(Box::new($func_name::make_function_object::<T>()));
         }
     }
+    // arithmetic functions
     add_function!(add);
     add_function!(div);
     add_function!(greater);
@@ -59,6 +84,12 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(mul);
     add_function!(muldiv);
     add_function!(sub);
+    // logical boolean functions
+    add_function!(and);
+    add_function!(or);
+    add_function!(not);
+    add_function!(xor);
+    // control flow functions
     s.push(Box::new(if_::make_function_object::<T>()));
     add_function!(if2);
     s
@@ -82,24 +113,31 @@ impl<T: metadata::Provider> Function<T> {
 fn expect_integer_result<V, T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> Result<V, Error>
     where V: std::str::FromStr + num::FromPrimitive {
     match expr.apply(provider) {
-        super::value::Value::Integer(term) => {
+        Value::Integer(term) => {
             match V::from_i32(term) {
                 Some(v) => Ok(v),
                 _ => Err(Error::TypeError),
             }
         },
-        super::value::Value::Double(term) => {
+        Value::Double(term) => {
             match V::from_f64(term) {
                 Some(v) => Ok(v),
                 _ => Err(Error::TypeError),
             }
         },
-        super::value::Value::Text(s) => {
+        Value::Text(s) => {
             match s.parse::<V>() {
                 Ok(term) => Ok(term),
                 _ => Err(Error::TypeError),
             }
         }
         _ => Err(Error::TypeError),
+    }
+}
+
+fn expect_bool_result<T: metadata::Provider>(expr: &expression::Expression<T>, provider: &T) -> bool {
+    match expr.apply_valued(provider) {
+        (Value::Empty, _) | (Value::Boolean(false), _) | (_, 0) => false,
+        _ => true,
     }
 }
