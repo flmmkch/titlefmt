@@ -1,5 +1,6 @@
-use super::*;
-use super::value::Value;
+use super::super::*;
+use super::super::function::Function;
+use super::super::value::Value;
 
 fn if_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
     match expressions.len() {
@@ -19,7 +20,7 @@ fn if_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expre
     }
 }
 
-pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
+pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
     Function::new(
         "if",
         Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { if_(provider, expressions) })

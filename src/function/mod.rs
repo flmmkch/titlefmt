@@ -23,7 +23,7 @@ pub struct Function<T: metadata::Provider> {
 
 macro_rules! function_object_maker {
     ($func_name: ident) => {
-        pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
+        pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
             Function::new(
                 stringify!($func_name),
                 Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { $func_name(provider, expressions) })
@@ -33,38 +33,14 @@ macro_rules! function_object_maker {
 }
 
 /// Arithmetic functions
-/// Addition
-mod add;
-/// Division
-mod div;
-/// Greater than
-mod greater;
-/// Maximum
-mod max;
-/// Minimum
-mod min;
-/// Modulo
-mod mod_;
-/// Multiplication
-mod mul;
-/// Multiplication then division
-mod muldiv;
-/// Substraction
-mod sub;
+mod arithmetic;
+use self::arithmetic::*;
 /// Boolean functions
-/// Logical and
-mod and;
-/// Logical or
-mod or;
-/// Logical not
-mod not;
-/// Logical exclusive or
-mod xor;
+mod logical;
+use self::logical::*;
 /// Control flow functions
-/// If
-mod if_;
-/// If2
-mod if2;
+mod control_flow;
+use self::control_flow::*;
 
 /// Initialize a list of the standard functions defined in title formatting.
 pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {

@@ -1,5 +1,6 @@
-use super::*;
-use super::value::Value;
+use super::super::*;
+use super::super::function::Function;
+use super::super::value::Value;
 
 fn mod_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
     if expressions.len() < 2 {
@@ -23,7 +24,7 @@ fn mod_<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expr
     Ok(Value::Integer(result))
 }
 
-pub fn make_function_object<T: metadata::Provider>() -> super::Function<T> {
+pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
     Function::new(
         "mod",
         Box::new(|provider: &T, expressions: &[Box<expression::Expression<T>>]| -> Result<Value, Error> { mod_(provider, expressions) })

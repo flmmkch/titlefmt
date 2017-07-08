@@ -1,5 +1,6 @@
-use super::*;
-use super::value::Value;
+use super::super::*;
+use super::super::function::Function;
+use super::super::value::Value;
 use std::cmp;
 
 fn min<T: metadata::Provider>(provider: &T, expressions: &[Box<expression::Expression<T>>]) -> Result<Value, Error> {
