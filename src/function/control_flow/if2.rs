@@ -33,22 +33,22 @@ fn test_function()
         {
             let expression = formatter.parser().parse("%tracknumber%. $if2(%composer%, %tracknumber%) - %title%").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+            assert_eq!("09. Beethoven - 9th Symphony", s.to_string().as_str());
         }
         {
             let expression = formatter.parser().parse("%tracknumber%. $if2(%artist%, %composer%) - %title%").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+            assert_eq!("09. Beethoven - 9th Symphony", s.to_string().as_str());
         }
         {
             let expression = formatter.parser().parse("%tracknumber%. $if2(%composer%, %artist%) - %title%").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. Beethoven - 9th Symphony", s.to_string().as_str());
+            assert_eq!("09. Beethoven - 9th Symphony", s.to_string().as_str());
         }
         {
             let expression = formatter.parser().parse("%tracknumber%. $if2(%albumartist%, %artist%) - %title%").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. ? - 9th Symphony", s.to_string().as_str());
+            assert_eq!("09. ? - 9th Symphony", s.to_string().as_str());
         }
     }
 }

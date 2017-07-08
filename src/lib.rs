@@ -46,7 +46,7 @@
 //!                 MetadataProvider::new(dict)
 //!             };
 //!             let s = expression.apply(&test_metadata);
-//!             assert_eq!("1. 9th Symphony, 1. Allegro ma non troppo, un poco maestoso", s.to_string().as_str());
+//!             assert_eq!("01. 9th Symphony, 1. Allegro ma non troppo, un poco maestoso", s.to_string().as_str());
 //!         }
 //!         {
 //!             let test_metadata = {
@@ -57,7 +57,7 @@
 //!                 MetadataProvider::new(dict)
 //!             };
 //!             let s = expression.apply(&test_metadata);
-//!             assert_eq!("5. David Bowie - Always Crashing In The Same Car", s.to_string().as_str());
+//!             assert_eq!("05. David Bowie - Always Crashing In The Same Car", s.to_string().as_str());
 //!         }
 //!     }
 //! }

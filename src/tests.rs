@@ -40,7 +40,7 @@ fn test_parser_optional() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. 9th Symphony (Beethoven)", s.to_string().as_str());
+            assert_eq!("09. 9th Symphony (Beethoven)", s.to_string().as_str());
         }
         {
             let test_metadata = {
@@ -50,7 +50,7 @@ fn test_parser_optional() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("5. Greensleeves", s.to_string().as_str());
+            assert_eq!("05. Greensleeves", s.to_string().as_str());
         }
     }
     {
@@ -64,7 +64,7 @@ fn test_parser_optional() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("9. 9th Symphony (Beethoven) - hop", s.to_string().as_str());
+            assert_eq!("09. 9th Symphony (Beethoven) - hop", s.to_string().as_str());
         }
         {
             let test_metadata = {
@@ -75,7 +75,7 @@ fn test_parser_optional() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("5. Greensleeves (?) [OK] - hop", s.to_string().as_str());
+            assert_eq!("05. Greensleeves (?) [OK] - hop", s.to_string().as_str());
         }
         {
             let test_metadata = {
@@ -85,7 +85,7 @@ fn test_parser_optional() {
                 MetadataProvider::new(dict)
             };
             let s = expression.apply(&test_metadata);
-            assert_eq!("5. Greensleeves", s.to_string().as_str());
+            assert_eq!("05. Greensleeves", s.to_string().as_str());
         }
     }
 }
