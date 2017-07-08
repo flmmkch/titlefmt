@@ -1,4 +1,5 @@
-use super::*;
+use ::metadata;
+use ::expression::{ Expression, Evaluation };
 
 /// Error encountered when applying a function.
 pub enum Error {
@@ -7,7 +8,7 @@ pub enum Error {
 }
 
 /// Generic type for function trait objects.
-pub type FunctionClosure<T> = Fn(&[Box<expression::Expression<T>>], &T) -> Result<value::Evaluation, Error>;
+pub type FunctionClosure<T> = Fn(&[Box<Expression<T>>], &T) -> Result<Evaluation, Error>;
 
 /// Definition of a function that can be used in expressions.
 pub struct Function<T: metadata::Provider> {
@@ -22,7 +23,7 @@ macro_rules! function_object_maker {
         pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
             Function::new(
                 stringify!($func_name),
-                Box::new(|expressions: &[Box<expression::Expression<T>>], provider: &T| -> Result<Evaluation, Error> { $func_name(expressions, provider) })
+                Box::new(|expressions: &[Box<Expression<T>>], provider: &T| -> Result<Evaluation, Error> { $func_name(expressions, provider) })
             )
         }
     }
@@ -139,7 +140,7 @@ impl<T: metadata::Provider> Function<T> {
             name: name_param.to_lowercase(),
         }
     }
-    pub fn apply(&self, arguments: &[Box<expression::Expression<T>>], provider: &T) -> Result<value::Evaluation, Error> {
+    pub fn apply(&self, arguments: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
         (self.closure)(&arguments, &provider)
     }
     pub fn name(&self) -> &str {

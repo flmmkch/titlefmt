@@ -1,3 +1,5 @@
+use super::{ Function, Error };
+
 /// Logical and
 pub mod and;
 pub use self::and::*;

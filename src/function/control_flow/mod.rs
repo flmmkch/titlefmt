@@ -1,3 +1,5 @@
+use super::{ Function, Error };
+
 /// if
 pub mod if_;
 pub use self::if_::*;

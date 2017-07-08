@@ -1,8 +1,8 @@
-use super::super::*;
-use super::super::function::Function;
-use super::super::value::{ Evaluation, Value };
+use super::{ Function, Error };
+use ::metadata;
+use ::expression::{ Expression, Evaluation, Value };
 
-fn or<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn or<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     let result : bool = expressions.iter().any(|ref expr| { expr.apply(provider).truth() });
     Ok(Evaluation::new(Value::Empty, result))
 }

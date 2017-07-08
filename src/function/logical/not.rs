@@ -1,8 +1,8 @@
-use super::super::*;
-use super::super::function::Function;
-use super::super::value::{ Evaluation, Value };
+use super::{ Function, Error };
+use ::metadata;
+use ::expression::{ Expression, Evaluation, Value };
 
-fn not<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn not<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() != 1 {
         return Err(Error::ArgumentError);
     }

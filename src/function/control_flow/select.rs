@@ -1,8 +1,8 @@
-use super::super::*;
-use super::super::function::Function;
-use super::super::value::{ Evaluation, Value };
+use super::{ Function, Error };
+use ::metadata;
+use ::expression::{ Expression, Evaluation, Value };
 
-fn select<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn select<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() == 0 {
         return Err(Error::ArgumentError);
     }
@@ -23,38 +23,3 @@ fn select<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>],
 }
 
 function_object_maker!(select);
-
-#[test]
-fn test_function()
-{
-    let formatter = super::super::Formatter::new();
-    // tests with functions
-    {
-        let test_metadata = super::super::tests::MetadataProvider::new(HashMap::new());
-        {
-            let expression = formatter.parser().parse("$select(2, one, two, three, four)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("two", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$select(4, one, two, three, four)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("four", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$select(5, one, two, three, four)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$select(6, one, two, three, four)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$select(-1, one, two, three, four)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("", s.to_string().as_str());
-        }
-    }
-}

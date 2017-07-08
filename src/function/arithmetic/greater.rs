@@ -1,8 +1,8 @@
-use super::super::*;
-use super::super::function::Function;
-use super::super::value::{ Evaluation, Value };
+use super::{ Function, Error };
+use ::metadata;
+use ::expression::{ Expression, Evaluation, Value };
 
-fn greater<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn greater<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
@@ -15,23 +15,3 @@ fn greater<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>]
 }
 
 function_object_maker!(greater);
-
-#[test]
-fn test_function()
-{
-    let formatter = super::super::Formatter::new();
-    // tests with functions
-    {
-        let test_metadata = super::super::tests::MetadataProvider::new(HashMap::new());
-        {
-            let expression = formatter.parser().parse("$if($greater(7,3), ok, no)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("ok", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$if($greater(1,3), ok, no)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("no", s.to_string().as_str());
-        }
-    }
-}

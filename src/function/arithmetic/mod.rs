@@ -1,3 +1,5 @@
+use super::{ Function, Error };
+
 /// Addition
 pub mod add;
 pub use self::add::*;

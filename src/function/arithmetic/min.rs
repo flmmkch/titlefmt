@@ -1,9 +1,10 @@
-use super::super::*;
-use super::super::function::Function;
-use super::super::value::{ Evaluation, Value };
+use super::{ Function, Error };
+use ::metadata;
+use ::expression::{ Expression, Evaluation, Value };
+
 use std::cmp;
 
-fn min<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn min<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() < 1 {
         return Err(Error::ArgumentError);
     }
@@ -19,28 +20,3 @@ fn min<T: metadata::Provider>(expressions: &[Box<expression::Expression<T>>], pr
 }
 
 function_object_maker!(min);
-
-#[test]
-fn test_function()
-{
-    let formatter = super::super::Formatter::new();
-    // tests with functions
-    {
-        let test_metadata = super::super::tests::MetadataProvider::new(HashMap::new());
-        {
-            let expression = formatter.parser().parse("$min(7,3)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("3", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$min(3,7)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("3", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$min(7,3,2,5)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("2", s.to_string().as_str());
-        }
-    }
-}

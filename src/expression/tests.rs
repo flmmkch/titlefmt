@@ -1,7 +1,7 @@
 // Parsing tests
-use super::*;
+use super::{ Item, Expression };
 use std::collections::HashMap;
-use super::super::tests::MetadataProvider;
+use ::tests::MetadataProvider;
 
 fn make_item_text(text: &str) -> Item<MetadataProvider> {
     Item::Text(text.to_owned())
@@ -17,9 +17,7 @@ fn test_apply_simple_text() {
         let mut items = Vec::new();
         items.push(make_item_text("test"));
         items.push(make_item_text("hello world"));
-        Expression {
-            items,
-        }
+        Expression::new(items)
     };
     let test_metadata = {
         let mut dict = HashMap::new();
@@ -38,9 +36,7 @@ fn test_apply_tags() {
             items.push(make_item_text("test "));
             items.push(make_item_tag("title"));
             items.push(make_item_text(" hello world"));
-            Expression {
-                items,
-            }
+            Expression::new(items)
         };
         let test_metadata = {
             let mut dict = HashMap::new();
@@ -58,9 +54,7 @@ fn test_apply_tags() {
             items.push(make_item_tag("artist"));
             items.push(make_item_text(" - "));
             items.push(make_item_tag("title"));
-            Expression {
-                items,
-            }
+            Expression::new(items)
         };
         {
             let test_metadata = {
@@ -98,14 +92,10 @@ fn test_apply_optional() {
             sub_items.push(make_item_text(" ("));
             sub_items.push(make_item_tag("composer"));
             sub_items.push(make_item_text(")"));
-            let sub_expr = Expression {
-                items: sub_items,
-            };
+            let sub_expr = Expression::new(sub_items);
             items.push(Item::OptionalExpr(Box::new(sub_expr)));
         }
-        Expression {
-            items,
-        }
+        Expression::new(items)
     };
     {
         let test_metadata = {
