@@ -36,8 +36,7 @@
 //!     let formatter = Formatter::new();
 //!     // tests with optional expressions
 //!     {
-//!         let parser = formatter.parser();
-//!         let expression = parser.parse("%tracknumber%.[ %artist% -] %title%").unwrap();
+//!         let expression = formatter.parser().parse("%tracknumber%.[ %artist% -] %title%").unwrap();
 //!         {
 //!             let test_metadata = {
 //!                 let mut dict = HashMap::new();
