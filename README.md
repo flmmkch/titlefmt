@@ -33,6 +33,7 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * iflonger
   * select
   * cut
+  * abbr
 
 ## Currently unimplemented functionalities
  * Advanced tag handling (expanding `%tracknumber%`, aliasing `%album artist%` and `%artist%`, etc.)

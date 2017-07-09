@@ -256,6 +256,46 @@ fn test_function_mod()
 }
 
 #[test]
+fn test_function_xor()
+{
+    let formatter = Formatter::new();
+    // tests with functions
+    {
+        let test_metadata = {
+            let mut dict = HashMap::new();
+            dict.insert("title", "Flood");
+            dict.insert("artist", "Boris");
+            ::tests::MetadataProvider::new(dict)
+        };
+        {
+            let expression = formatter.parser().parse("$if($xor(test, test2, test3), ok, not)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("not", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$if($xor(%title%, test2, test3), ok, not)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("ok", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$if($xor(%title%, %artist%, test3), ok, not)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("not", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$if($xor(%title%, %artist%, %title%. test), ok, not)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("ok", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$if($xor(%title%, %album%, test3), ok, not)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("ok", s.to_string().as_str());
+        }
+    }
+}
+
+#[test]
 fn test_function_if()
 {
     let formatter = Formatter::new();
@@ -403,42 +443,28 @@ fn test_function_cut()
     }
 }
 
+
 #[test]
-fn test_function_xor()
+fn test_function_abbr()
 {
     let formatter = Formatter::new();
     // tests with functions
     {
-        let test_metadata = {
-            let mut dict = HashMap::new();
-            dict.insert("title", "Flood");
-            dict.insert("artist", "Boris");
-            ::tests::MetadataProvider::new(dict)
-        };
+        let test_metadata = ::tests::MetadataProvider::new(HashMap::new());
         {
-            let expression = formatter.parser().parse("$if($xor(test, test2, test3), ok, not)").unwrap();
+            let expression = formatter.parser().parse("$abbr(hello world)").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("not", s.to_string().as_str());
+            assert_eq!("hw", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$if($xor(%title%, test2, test3), ok, not)").unwrap();
+            let expression = formatter.parser().parse("$abbr('Hunting & Gathering (Cydonia)')").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("ok", s.to_string().as_str());
+            assert_eq!("H&GC", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$if($xor(%title%, %artist%, test3), ok, not)").unwrap();
+            let expression = formatter.parser().parse("$abbr('21st Century Schizoid Man (including Mirrors)')").unwrap();
             let s = expression.apply(&test_metadata);
-            assert_eq!("not", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$if($xor(%title%, %artist%, %title%. test), ok, not)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("ok", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$if($xor(%title%, %album%, test3), ok, not)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("ok", s.to_string().as_str());
+            assert_eq!("2CSMiM", s.to_string().as_str());
         }
     }
 }

@@ -129,6 +129,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(iflonger);
     add_function!(select);
     // string functions
+    add_function!(abbr);
     add_function!(cut);
     s
 }
