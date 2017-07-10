@@ -443,7 +443,6 @@ fn test_function_cut()
     }
 }
 
-
 #[test]
 fn test_function_abbr()
 {
@@ -465,6 +464,26 @@ fn test_function_abbr()
             let expression = formatter.parser().parse("$abbr('21st Century Schizoid Man (including Mirrors)')").unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("2CSMiM", s.to_string().as_str());
+        }
+    }
+}
+
+#[test]
+fn test_function_caps()
+{
+    let formatter = Formatter::new();
+    // tests with functions
+    {
+        let test_metadata = ::tests::MetadataProvider::new(HashMap::new());
+        {
+            let expression = formatter.parser().parse("$caps(hello world)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("Hello World", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$caps(ça t''étonne?)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("Ça T'étonne?", s.to_string().as_str());
         }
     }
 }
