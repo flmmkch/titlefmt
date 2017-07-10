@@ -461,6 +461,11 @@ fn test_string_functions()
             assert_eq!("Ça T'étonne ね?", s.to_string().as_str());
         }
         {
+            let expression = formatter.parser().parse("$caps2(ça t''éTonne ね?)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("Ça T'éTonne ね?", s.to_string().as_str());
+        }
+        {
             let expression = formatter.parser().parse("$cut(hello, 1)").unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("h", s.to_string().as_str());
