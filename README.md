@@ -35,6 +35,7 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * abbr
   * caps
   * caps2
+  * crlf
   * cut
 
 ## Currently unimplemented functionalities

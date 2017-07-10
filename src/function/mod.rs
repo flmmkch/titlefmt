@@ -132,6 +132,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(abbr);
     add_function!(caps);
     add_function!(caps2);
+    add_function!(crlf);
     add_function!(cut);
     s
 }
