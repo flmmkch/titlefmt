@@ -424,27 +424,7 @@ fn test_function_select()
 }
 
 #[test]
-fn test_function_cut()
-{
-    let formatter = Formatter::new();
-    // tests with functions
-    {
-        let test_metadata = ::tests::MetadataProvider::new(HashMap::new());
-        {
-            let expression = formatter.parser().parse("$cut(hello, 1)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("h", s.to_string().as_str());
-        }
-        {
-            let expression = formatter.parser().parse("$cut(小さな恋のうた, 3)").unwrap();
-            let s = expression.apply(&test_metadata);
-            assert_eq!("小さな", s.to_string().as_str());
-        }
-    }
-}
-
-#[test]
-fn test_function_abbr()
+fn test_string_functions()
 {
     let formatter = Formatter::new();
     // tests with functions
@@ -465,16 +445,6 @@ fn test_function_abbr()
             let s = expression.apply(&test_metadata);
             assert_eq!("2CSMiM", s.to_string().as_str());
         }
-    }
-}
-
-#[test]
-fn test_function_caps()
-{
-    let formatter = Formatter::new();
-    // tests with functions
-    {
-        let test_metadata = ::tests::MetadataProvider::new(HashMap::new());
         {
             let expression = formatter.parser().parse("$caps(hello world)").unwrap();
             let s = expression.apply(&test_metadata);
@@ -484,6 +454,21 @@ fn test_function_caps()
             let expression = formatter.parser().parse("$caps(ça t''étonne?)").unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("Ça T'étonne?", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$caps(ÇA T''ÉTONNE ね?)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("Ça T'étonne ね?", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$cut(hello, 1)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("h", s.to_string().as_str());
+        }
+        {
+            let expression = formatter.parser().parse("$cut(小さな恋のうた, 3)").unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("小さな", s.to_string().as_str());
         }
     }
 }

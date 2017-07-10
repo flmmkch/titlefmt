@@ -18,10 +18,10 @@ fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T)
                     caps_next_character = false;
                     },
                 (false, false) => {
-                    result_chars.push(c);
+                    result_chars.extend(c.to_lowercase());
                 },
                 (_, true) => {
-                    result_chars.push(c);
+                    result_chars.extend(c.to_lowercase());
                     caps_next_character = true;
                 },
             }
