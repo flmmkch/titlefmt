@@ -13,3 +13,6 @@ fn cut<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(cut);
+
+#[cfg(test)]
+mod test;

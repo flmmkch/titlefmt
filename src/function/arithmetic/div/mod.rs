@@ -23,3 +23,6 @@ fn div<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(div);
+
+#[cfg(test)]
+mod test;

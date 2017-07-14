@@ -15,3 +15,6 @@ fn add<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(add);
+
+#[cfg(test)]
+mod test;

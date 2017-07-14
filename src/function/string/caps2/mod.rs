@@ -2,7 +2,7 @@ use super::{ Function, Error };
 use ::metadata;
 use ::expression::{ Expression, Evaluation, Value };
 
-fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn caps2<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
     if expressions.len() != 1 {
         return Err(Error::ArgumentError);
     }
@@ -18,10 +18,10 @@ fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T)
                     caps_next_character = false;
                     },
                 (false, false) => {
-                    result_chars.extend(c.to_lowercase());
+                    result_chars.push(c);
                 },
                 (_, true) => {
-                    result_chars.extend(c.to_lowercase());
+                    result_chars.push(c);
                     caps_next_character = true;
                 },
             }
@@ -31,4 +31,7 @@ fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T)
     Ok(Evaluation::new(Value::Text(result_text), truth))
 }
 
-function_object_maker!(caps);
+function_object_maker!(caps2);
+
+#[cfg(test)]
+mod test;

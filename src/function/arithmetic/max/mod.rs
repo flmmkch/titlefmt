@@ -20,3 +20,6 @@ fn max<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(max);
+
+#[cfg(test)]
+mod test;

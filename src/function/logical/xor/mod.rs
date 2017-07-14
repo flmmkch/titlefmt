@@ -12,3 +12,6 @@ fn xor<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(xor);
+
+#[cfg(test)]
+mod test;

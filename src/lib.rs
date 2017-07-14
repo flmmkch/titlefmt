@@ -81,7 +81,7 @@ mod parser;
 
 /// Tests module.
 #[cfg(test)]
-mod tests;
+mod test;
 
 /// Formatter module.
 mod formatter;

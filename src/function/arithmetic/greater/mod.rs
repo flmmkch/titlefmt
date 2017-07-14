@@ -15,3 +15,6 @@ fn greater<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: 
 }
 
 function_object_maker!(greater);
+
+#[cfg(test)]
+mod test;

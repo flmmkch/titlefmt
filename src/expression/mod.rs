@@ -1,6 +1,6 @@
 /// Tests.
 #[cfg(test)]
-mod tests;
+mod test;
 
 mod expression;
 pub use self::expression::Expression;

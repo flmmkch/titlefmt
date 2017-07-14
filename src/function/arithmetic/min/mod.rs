@@ -20,3 +20,6 @@ fn min<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(min);
+
+#[cfg(test)]
+mod test;

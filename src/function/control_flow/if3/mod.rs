@@ -18,3 +18,6 @@ fn if3<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
 }
 
 function_object_maker!(if3);
+
+#[cfg(test)]
+mod test;

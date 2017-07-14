@@ -23,3 +23,6 @@ fn select<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &
 }
 
 function_object_maker!(select);
+
+#[cfg(test)]
+mod test;

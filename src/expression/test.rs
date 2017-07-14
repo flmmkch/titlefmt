@@ -1,7 +1,8 @@
 // Parsing tests
 use super::{ Item, Expression };
+use ::Formatter;
 use std::collections::HashMap;
-use ::tests::MetadataProvider;
+use ::test::MetadataProvider;
 
 fn make_item_text(text: &str) -> Item<MetadataProvider> {
     Item::Text(text.to_owned())
@@ -117,5 +118,71 @@ fn test_apply_optional() {
         };
         let s = expression.apply(&test_metadata);
         assert_eq!("05. Greensleeves", s.to_string().as_str());
+    }
+}
+
+
+#[test]
+fn test_parsed() {
+    let formatter = Formatter::new();
+    // tests with optional expressions
+    {
+        let expression = formatter.parser().parse("%tracknumber%. %title%[ (%composer%)]").unwrap();
+        {
+            let test_metadata = {
+                let mut dict = HashMap::new();
+                dict.insert("tracknumber", "9");
+                dict.insert("title", "9th Symphony");
+                dict.insert("composer", "Beethoven");
+                MetadataProvider::new(dict)
+            };
+            let s = expression.apply(&test_metadata);
+            assert_eq!("09. 9th Symphony (Beethoven)", s.to_string().as_str());
+        }
+        {
+            let test_metadata = {
+                let mut dict = HashMap::new();
+                dict.insert("tracknumber", "5");
+                dict.insert("title", "Greensleeves");
+                MetadataProvider::new(dict)
+            };
+            let s = expression.apply(&test_metadata);
+            assert_eq!("05. Greensleeves", s.to_string().as_str());
+        }
+    }
+    {
+        let expression = formatter.parser().parse("%tracknumber%. %title%[ (%composer%)[ '['%testfield%']'] - hop]").unwrap();
+        {
+            let test_metadata = {
+                let mut dict = HashMap::new();
+                dict.insert("tracknumber", "9");
+                dict.insert("title", "9th Symphony");
+                dict.insert("composer", "Beethoven");
+                MetadataProvider::new(dict)
+            };
+            let s = expression.apply(&test_metadata);
+            assert_eq!("09. 9th Symphony (Beethoven) - hop", s.to_string().as_str());
+        }
+        {
+            let test_metadata = {
+                let mut dict = HashMap::new();
+                dict.insert("tracknumber", "5");
+                dict.insert("title", "Greensleeves");
+                dict.insert("testfield", "OK");
+                MetadataProvider::new(dict)
+            };
+            let s = expression.apply(&test_metadata);
+            assert_eq!("05. Greensleeves (?) [OK] - hop", s.to_string().as_str());
+        }
+        {
+            let test_metadata = {
+                let mut dict = HashMap::new();
+                dict.insert("tracknumber", "5");
+                dict.insert("title", "Greensleeves");
+                MetadataProvider::new(dict)
+            };
+            let s = expression.apply(&test_metadata);
+            assert_eq!("05. Greensleeves", s.to_string().as_str());
+        }
     }
 }

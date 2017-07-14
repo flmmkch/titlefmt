@@ -26,3 +26,6 @@ pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
         Box::new(|expressions: &[Box<Expression<T>>], provider: &T| -> Result<Evaluation, Error> { if_(expressions, provider) })
     )
 }
+
+#[cfg(test)]
+mod test;
