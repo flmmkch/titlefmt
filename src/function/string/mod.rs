@@ -15,3 +15,6 @@ pub use self::crlf::*;
 /// cut
 pub mod cut;
 pub use self::cut::*;
+/// directory
+pub mod directory;
+pub use self::directory::*;
