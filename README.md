@@ -11,6 +11,7 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
 ## Currently implemented functionalities
 * Field references, such as %artist% or %title%
 * Conditional selection with square brackets [ ] for optional sub-expressions
+* Advanced tag handling (expanding `%tracknumber%` with a leading zero if it's only one digit, aliasing `%album artist%` and `%artist%`, etc.)
 * Functions available
   * add
   * div
@@ -43,5 +44,4 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * filename
 
 ## Currently unimplemented functionalities
- * Advanced tag handling (expanding `%tracknumber%`, aliasing `%album artist%` and `%artist%`, etc.)
  * Variables
