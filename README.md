@@ -40,6 +40,7 @@ Example: `$ titleformatter "%track%. [%artist% - ] %title%" test01.flac test02.m
   * directory
   * directory_path
   * ext
+  * filename
 
 ## Currently unimplemented functionalities
  * Advanced tag handling (expanding `%tracknumber%`, aliasing `%album artist%` and `%artist%`, etc.)
