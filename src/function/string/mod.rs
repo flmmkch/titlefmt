@@ -18,3 +18,6 @@ pub use self::cut::*;
 /// directory
 pub mod directory;
 pub use self::directory::*;
+/// directory_path
+pub mod directory_path;
+pub use self::directory_path::*;
