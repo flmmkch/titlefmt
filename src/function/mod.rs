@@ -136,6 +136,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(cut);
     add_function!(directory);
     add_function!(directory_path);
+    add_function!(ext);
     s
 }
 
