@@ -36,7 +36,12 @@ fn directory<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider
             }
         };
     }
-    let result_text: String = result_path.to_string_lossy().deref().to_owned();
+    let result_text: String = {
+        match result_path.file_stem() {
+            Some(os_str) => os_str.to_string_lossy().deref().to_owned(),
+            None => "".to_owned(),
+        }
+    };
     Ok(Evaluation::new(Value::Text(result_text), truth))
 }
 
