@@ -1,7 +1,6 @@
-use nom::{IResult, alphanumeric, is_space};
+use nom::{ErrorKind, IResult, alphanumeric, is_space};
 use std::str;
 use std::string;
-use nom::ErrorKind;
 use super::metadata;
 use super::expression;
 
