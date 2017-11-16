@@ -25,6 +25,7 @@ pub fn parse<'a, 'b, T: metadata::Provider>(string: &str, format_parser: &super:
             Ok(real_expr)
         },
         IResult::Error(ErrorKind::Custom(err)) => Err(err),
+        IResult::Error(_) => Err(ParseError::NomError),
         _ => Err(ParseError::Unknown),
     }
 }
@@ -98,7 +99,7 @@ mod building {
     }
 }
 
-fn make_escaped_text_item(string: &str) -> Result<building::Item, ParseError> {
+fn make_escaped_text_item(string: &str) -> Result<building::Item, u32> {
     Ok(building::Item::Text(string.to_owned()))
 }
 
@@ -137,31 +138,32 @@ fn unicode_converter(bytes: &[u8]) -> Result<&str, ParseError> {
     }
 }
 
-named!(item_tag<&[u8], building::Item, ParseError>,
-    add_return_error!(
-        ErrorKind::Custom(ParseError::NomError),
+named!(item_content<&[u8], String, ParseError>,
+    fold_many1!(
         map_res!(
-            delimited!(
-                tag!("%"),
-                fold_many1!(
-                    map_res!(
-                        alt!(
-                            alphanumeric |
-                            tag!("_") |
-                            tag!(" ")
-                        ),
-                        unicode_converter
-                    ),
-                    String::new(),
-                    |mut acc: String, string: &str| -> String {
-                        acc.push_str(string);
-                        acc
-                    }
-                ),
-                tag!("%")
+            alt!(
+                alphanumeric |
+                tag!("_") |
+                tag!(" ")
             ),
-            make_tag_item
-        )
+            unicode_converter
+        ),
+        String::new(),
+        |mut acc: String, string: &str| -> String {
+            acc.push_str(string);
+            acc
+        }
+    )
+);
+
+named!(item_tag<&[u8], building::Item, ParseError>,
+    map_res!(
+        delimited!(
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("%")),
+            item_content,
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("%"))
+        ),
+        make_tag_item
     )
 );
 
@@ -173,12 +175,9 @@ fn optional_expression_expr(input: &[u8]) -> IResult<&[u8], building::Expression
     limited_expression_parser(input, &[b']'])
 }
 
-named!(optional_expression<&[u8], Box<building::Expression>>,
+named!(optional_expression<&[u8], Box<building::Expression>, ParseError>,
     map_res!(
-        add_return_error!(
-            ErrorKind::Custom(42),
-            optional_expression_expr
-            ),
+        optional_expression_expr,
         make_expression_box
     )
 );
@@ -188,16 +187,13 @@ fn make_optional_item(expression: Box<building::Expression>) -> Result<building:
 }
 
 named!(item_optional<&[u8], building::Item, ParseError>,
-    add_return_error!(
-        ErrorKind::Custom(ParseError::NomError),
-        map_res!(
-            do_parse!(
-                tag!("[") >>
-                expr: optional_expression >>
-                tag!("]") >>
-                (expr)),
-            make_optional_item
-        )
+    map_res!(
+        do_parse!(
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("[")) >>
+            expr: optional_expression >>
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("]")) >>
+            (expr)),
+        make_optional_item
     )
 );
 
@@ -227,11 +223,9 @@ fn function_arg_parser(input: &[u8]) -> IResult<&[u8], building::Expression, Par
 
 named!(function_args<&[u8], Vec<building::Expression>, ParseError>,
     separated_list!(
-        tag!(","),
+        add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!(",")),
         do_parse!(
-            add_return_error!(ErrorKind::Custom(ParseError::NomError),
-                take_while!( is_space )
-             ) >>
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), take_while!( is_space )) >>
             result: function_arg_parser >>
             (result)
         )
@@ -248,20 +242,17 @@ fn make_function_item(func_call: (String, Vec<building::Expression>)) -> buildin
 }
 
 named!(function_item<&[u8], building::Item, ParseError>,
-    add_return_error!(
-        ErrorKind::Custom(ParseError::NomError),
-        map!(
-            do_parse!(
-                add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("$")) >>
-                // function name
-                func_name: function_name >>
-                add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("(")) >>
-                // arguments
-                args: function_args >>
-                add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!(")")) >>
-                (func_name, args)),
-            make_function_item
-        )
+    map!(
+        do_parse!(
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("$")) >>
+            // function name
+            func_name: function_name >>
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("(")) >>
+            // arguments
+            args: function_args >>
+            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!(")")) >>
+            (func_name, args)),
+        make_function_item
     )
 );
 

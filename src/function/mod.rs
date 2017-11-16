@@ -1,10 +1,31 @@
 use ::metadata;
 use ::expression::{ Expression, Evaluation };
+use std;
 
 /// Error encountered when applying a function.
+#[derive(Debug)]
 pub enum Error {
     ArgumentError,
     TypeError,
+}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", *self)
+    }
+}
+
+impl std::error::Error for Error {
+    fn description(&self) -> &str {
+        match self {
+            &Error::ArgumentError => "Argument error",
+            &Error::TypeError => "Type error",
+        }
+    }
+
+    fn cause(&self) -> Option<&std::error::Error> {
+        None
+    }
 }
 
 /// Generic type for function trait objects.
