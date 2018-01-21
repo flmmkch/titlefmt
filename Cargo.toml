@@ -9,8 +9,8 @@ license = "MIT/Apache-2.0"
 # default = ["ffmpeg"]
 
 [dependencies]
-ffmpeg = { git = "https://github.com/meh/rust-ffmpeg", rev = "28b7a82ac1ca1e201f1967b7231c21eb2e2f7447", optional = true }
-nom = "3.2"
+nom = { version = "^3.2", features = ["verbose-errors"] }
+ffmpeg = { git = "https://github.com/meh/rust-ffmpeg", rev = "20c7ef399aa01c50eab81d87b1591ac11cd8c02c", optional = true }
 
 [[bin]]
 name = "titleformatter"

@@ -1,5 +1,5 @@
-extern crate ffmpeg;
 extern crate titleformat;
+extern crate ffmpeg;
 use std::env;
 use titleformat::Formatter;
 use titleformat::ffmpeg_audio::*;

@@ -1,4 +1,4 @@
-use nom::{ErrorKind, IResult, alphanumeric, is_space};
+use nom::{self, IResult, alphanumeric, is_space};
 use std::str;
 use std::string;
 use super::metadata;
@@ -24,7 +24,6 @@ pub fn parse<'a, 'b, T: metadata::Provider>(string: &str, format_parser: &super:
             let real_expr = build_expression(building_expr, &format_parser)?;
             Ok(real_expr)
         },
-        IResult::Error(ErrorKind::Custom(err)) => Err(err),
         IResult::Error(_) => Err(ParseError::NomError),
         _ => Err(ParseError::Unknown),
     }
@@ -103,42 +102,39 @@ fn make_escaped_text_item(string: &str) -> Result<building::Item, u32> {
     Ok(building::Item::Text(string.to_owned()))
 }
 
-named!(escaped_text<&[u8], building::Item, ParseError>,
-    add_return_error!(
-        ErrorKind::Custom(ParseError::NomError),
-        alt!(
-            // special rule: '' => turns to a single ' text
-            value!(
-                building::Item::Text("'".to_owned()),
-                tag!("''")
-                ) |
-            // otherwise text enclosed with single quotes ' turn into normal text
+named!(escaped_text<&[u8], building::Item>,
+    alt!(
+        // special rule: '' => turns to a single ' text
+        value!(
+            building::Item::Text("'".to_owned()),
+            tag!("''")
+            ) |
+        // otherwise text enclosed with single quotes ' turn into normal text
+        map_res!(
             map_res!(
-                map_res!(
-                    delimited!(
-                        tag!("'"),
-                        take_until!("'"),
-                        tag!("'")),
-                    str::from_utf8
-                ),
-                make_escaped_text_item
-            )
+                delimited!(
+                    tag!("'"),
+                    take_until!("'"),
+                    tag!("'")),
+                str::from_utf8
+            ),
+            make_escaped_text_item
         )
     )
 );
 
-fn make_tag_item(string: String) -> Result<building::Item, ParseError> {
+fn make_tag_item(string: String) -> Result<building::Item, u32> {
     Ok(building::Item::Tag(string))
 }
 
-fn unicode_converter(bytes: &[u8]) -> Result<&str, ParseError> {
+fn unicode_converter(bytes: &[u8]) -> Result<&str, u32> {
     match str::from_utf8(bytes) {
         Ok(string) => Ok(string),
-        Err(utf8error) => Err(ParseError::StrUnicodeError(utf8error)),
+        Err(_) => Err(0),
     }
 }
 
-named!(item_content<&[u8], String, ParseError>,
+named!(item_content<&[u8], String>,
     fold_many1!(
         map_res!(
             alt!(
@@ -156,48 +152,48 @@ named!(item_content<&[u8], String, ParseError>,
     )
 );
 
-named!(item_tag<&[u8], building::Item, ParseError>,
+named!(item_tag<&[u8], building::Item>,
     map_res!(
         delimited!(
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("%")),
+            tag!("%"),
             item_content,
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("%"))
+            tag!("%")
         ),
         make_tag_item
     )
 );
 
-fn make_expression_box(expression: building::Expression) -> Result<Box<building::Expression>, ParseError> {
+fn make_expression_box(expression: building::Expression) -> Result<Box<building::Expression>, u32> {
     Ok(Box::new(expression))
 }
 
-fn optional_expression_expr(input: &[u8]) -> IResult<&[u8], building::Expression, ParseError> {
+fn optional_expression_expr(input: &[u8]) -> IResult<&[u8], building::Expression> {
     limited_expression_parser(input, &[b']'])
 }
 
-named!(optional_expression<&[u8], Box<building::Expression>, ParseError>,
+named!(optional_expression<&[u8], Box<building::Expression>>,
     map_res!(
         optional_expression_expr,
         make_expression_box
     )
 );
 
-fn make_optional_item(expression: Box<building::Expression>) -> Result<building::Item, ParseError> {
+fn make_optional_item(expression: Box<building::Expression>) -> Result<building::Item, u32> {
     Ok(building::Item::OptionalExpr(expression))
 }
 
-named!(item_optional<&[u8], building::Item, ParseError>,
+named!(item_optional<&[u8], building::Item>,
     map_res!(
         do_parse!(
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("[")) >>
+            tag!("[") >>
             expr: optional_expression >>
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("]")) >>
+            tag!("]") >>
             (expr)),
         make_optional_item
     )
 );
 
-named!(function_name<&[u8], String, ParseError>,
+named!(function_name<&[u8], String>,
     fold_many1!(
         map_res!(
             alt!(
@@ -214,18 +210,18 @@ named!(function_name<&[u8], String, ParseError>,
     )
 );
 
-fn function_arg_parser(input: &[u8]) -> IResult<&[u8], building::Expression, ParseError> {
+fn function_arg_parser(input: &[u8]) -> IResult<&[u8], building::Expression> {
     // 2 closing tokens for an argument parser:
     // the argument separator ","
     // and the function closer ")"
     limited_expression_parser(input, &[b',', b')'])
 }
 
-named!(function_args<&[u8], Vec<building::Expression>, ParseError>,
+named!(function_args<&[u8], Vec<building::Expression>>,
     separated_list!(
-        add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!(",")),
+        tag!(","),
         do_parse!(
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), take_while!( is_space )) >>
+            take_while!( is_space ) >>
             result: function_arg_parser >>
             (result)
         )
@@ -241,22 +237,22 @@ fn make_function_item(func_call: (String, Vec<building::Expression>)) -> buildin
     building::Item::Function(func_call)
 }
 
-named!(function_item<&[u8], building::Item, ParseError>,
+named!(function_item<&[u8], building::Item>,
     map!(
         do_parse!(
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("$")) >>
+            tag!("$") >>
             // function name
             func_name: function_name >>
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!("(")) >>
+            tag!("(") >>
             // arguments
             args: function_args >>
-            add_return_error!(ErrorKind::Custom(ParseError::NomError), tag!(")")) >>
+            tag!(")") >>
             (func_name, args)),
         make_function_item
     )
 );
 
-named!(parse_item<&[u8], building::Item, ParseError>,
+named!(parse_item<&[u8], building::Item>,
     alt!(
         escaped_text |
         item_tag |
@@ -265,7 +261,7 @@ named!(parse_item<&[u8], building::Item, ParseError>,
     )
 );
 
-fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Result<(), ParseError> {
+fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Result<(), u32> {
     if current_text.len() > 0 {
         let text_result = String::from_utf8(current_text.to_vec());
         match text_result {
@@ -273,7 +269,7 @@ fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Re
                 items.push(building::Item::Text(text));
                 current_text.clear();
             },
-            Err(e) => return Err(ParseError::UnicodeError(e)),
+            Err(_) => return Err(0),
         }
     };
     Ok(())
@@ -282,12 +278,12 @@ fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Re
 macro_rules! flush_text {
     ($x:expr, $y:expr) => {
         if let Err(err) = flush_text($x, $y) {
-            return IResult::Error(ErrorKind::Custom(err));
+            return IResult::Error(nom::Err::Code(nom::ErrorKind::Custom(err)));
         };
     }
 }
 
-fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8]) -> IResult<&'a [u8], building::Expression, ParseError> {
+fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8]) -> IResult<&'a [u8], building::Expression> {
     let mut items: Vec<building::Item> = Vec::new();
     let mut current_text: Vec<u8> = Vec::new();
     'expression_loop: while input.len() > 0 {
@@ -315,7 +311,7 @@ fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8
     IResult::Done(input, expression)
 }
 
-fn parse_expression(input: &[u8]) -> IResult<&[u8], building::Expression, ParseError> {
+fn parse_expression(input: &[u8]) -> IResult<&[u8], building::Expression> {
     limited_expression_parser(input, &[])
 }
 
