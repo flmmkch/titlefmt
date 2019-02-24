@@ -13,6 +13,7 @@ include = [
     "Cargo.toml",
     "LICENSE*",
     "README.md",
+    ".travis.yml",
 ]
 
 [dependencies]
