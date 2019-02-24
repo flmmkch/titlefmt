@@ -1,11 +1,11 @@
-//! `titleformat` is a title formatting expression library, enabling the processing and automatic formatting of media metadata.
+//! `titlefmt` is a title formatting expression library. It enables automatic formatting of media metadata.
 //! 
 //! # Example
 //! ```
-//! extern crate titleformat;
+//! extern crate titlefmt;
 //!
 //! use std::collections::HashMap;
-//! use titleformat::{ metadata, Formatter };
+//! use titlefmt::{ metadata, Formatter };
 //!
 //! pub struct MetadataProvider<'a> {
 //!     metadata_dict: HashMap<&'a str, &'a str>,

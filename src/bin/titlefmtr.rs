@@ -1,8 +1,8 @@
-extern crate titleformat;
+extern crate titlefmt;
 extern crate metaflac;
 extern crate id3;
 use std::env;
-use titleformat::Formatter;
+use titlefmt::Formatter;
 use std::path::{Path, PathBuf};
 
 fn main() {
@@ -43,7 +43,7 @@ fn main() {
 	}
 	if display_help {
 		println!("Usage:");
-		println!("titleformatter [expression] [filenames...]");
+		println!("{} [expression] [filenames...]", &args[0]);
 		println!("where [expression] is a Title Formatting expression, such as \"%tracknumber%. [%artist% - ]%title%\"");
 	}
 }
@@ -77,7 +77,7 @@ impl MetadataFile {
 	}
 }
 
-impl titleformat::metadata::Provider for MetadataFile {
+impl titlefmt::metadata::Provider for MetadataFile {
 	fn tag_value(&self, tag_name: &str) -> Option<String> {
 		match self {
 			&MetadataFile::FlacMetadata(ref flac_metadata) => flac_metadata.get_vorbis(tag_name).and_then(|v| v.first()).cloned(),
