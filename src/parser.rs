@@ -20,12 +20,11 @@ pub fn parse<'a, 'b, T: metadata::Provider>(string: &str, format_parser: &super:
     where 'a: 'b {
     let result = parse_expression(string.as_bytes());
     match result {
-        IResult::Done(_, building_expr) => {
+        Ok((_, building_expr)) => {
             let real_expr = build_expression(building_expr, &format_parser)?;
             Ok(real_expr)
         },
-        IResult::Error(_) => Err(ParseError::NomError),
-        _ => Err(ParseError::Unknown),
+        Err(_) => Err(ParseError::NomError),
     }
 }
 
@@ -261,7 +260,7 @@ named!(parse_item<&[u8], building::Item>,
     )
 );
 
-fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Result<(), u32> {
+fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> bool {
     if current_text.len() > 0 {
         let text_result = String::from_utf8(current_text.to_vec());
         match text_result {
@@ -269,16 +268,16 @@ fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> Re
                 items.push(building::Item::Text(text));
                 current_text.clear();
             },
-            Err(_) => return Err(0),
+            Err(_) => return false,
         }
     };
-    Ok(())
+    true
 }
 
 macro_rules! flush_text {
-    ($x:expr, $y:expr) => {
-        if let Err(err) = flush_text($x, $y) {
-            return IResult::Error(nom::Err::Code(nom::ErrorKind::Custom(err)));
+    ($x:expr, $y:expr, $input:expr) => {
+        if !flush_text($x, $y) {
+            return Err(nom::Err::Error(nom::Context::Code($input, nom::ErrorKind::Custom(1))));
         };
     }
 }
@@ -293,9 +292,9 @@ fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8
         }
         let parse_result = parse_item(input);
         match parse_result {
-            IResult::Done(input_remaining, new_item) => {
+            Ok((input_remaining, new_item)) => {
                 input = input_remaining;
-                flush_text!(&mut current_text, &mut items);
+                flush_text!(&mut current_text, &mut items, input);
                 items.push(new_item);
             },
             _ => {
@@ -304,11 +303,11 @@ fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8
             },
         }
     }
-    flush_text!(&mut current_text, &mut items);
+    flush_text!(&mut current_text, &mut items, input);
     let expression = building::Expression {
         items,
     };
-    IResult::Done(input, expression)
+    Ok((input, expression))
 }
 
 fn parse_expression(input: &[u8]) -> IResult<&[u8], building::Expression> {

@@ -1,17 +1,19 @@
 [package]
 name = "titleformat"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Victor Nivet <victor@saumon.ninja>"]
 description = "Metadata Title Formatting Library"
 license = "MIT/Apache-2.0"
 
-[features]
-# default = ["ffmpeg"]
-
 [dependencies]
-nom = { version = "^3.2", features = ["verbose-errors"] }
-ffmpeg = { git = "https://github.com/meh/rust-ffmpeg", rev = "20c7ef399aa01c50eab81d87b1591ac11cd8c02c", optional = true }
+nom = "4.2.0"
+id3 = { version = "0.3.0", optional = true }
+metaflac = { version = "0.1.8", optional = true }
+
+[features]
+metadata_libs = ["id3", "metaflac"]
+titleformatter = ["metadata_libs"]
 
 [[bin]]
 name = "titleformatter"
-required-features = ["ffmpeg"]
+required-features = ["titleformatter"]

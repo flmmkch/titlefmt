@@ -87,7 +87,3 @@ pub use formatter::Formatter;
 /// FormatParser module.
 mod format_parser;
 pub use format_parser::FormatParser;
-
-/// Basic implementation of a metadata provider using FFmpeg. Requires `features=ffmpeg`.
-#[cfg(feature = "ffmpeg")]
-pub mod ffmpeg_audio;
