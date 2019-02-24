@@ -42,6 +42,7 @@ Example: `$ cargo run --release --bin titlefmtr "%track%. [%artist% - ] %title%"
   * directory_path
   * ext
   * filename
+  * hex
 
 ## Currently unimplemented functionalities
  * Variables

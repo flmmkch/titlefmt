@@ -27,3 +27,6 @@ pub use self::ext::*;
 /// filename
 pub mod filename;
 pub use self::filename::*;
+/// hex
+pub mod hex;
+pub use self::hex::*;
