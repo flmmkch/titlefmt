@@ -4,6 +4,7 @@ version = "0.3.0"
 authors = ["Victor Nivet <victor@saumon.ninja>"]
 description = "Metadata Title Formatting Library"
 license = "MIT/Apache-2.0"
+repository = "https://github.com/suntorvic/titlefmt"
 
 [dependencies]
 nom = "4.2.0"
