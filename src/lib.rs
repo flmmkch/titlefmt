@@ -1,5 +1,5 @@
 //! `titlefmt` is a title formatting expression library. It enables automatic formatting of media metadata.
-//! 
+//!
 //! # Example
 //! ```
 //! extern crate titlefmt;
@@ -65,10 +65,10 @@
 
 #[macro_use]
 extern crate nom;
-/// Metadata provider trait module.
-pub mod metadata;
 /// Expression module.
 pub mod expression;
+/// Metadata provider trait module.
+pub mod metadata;
 
 /// Functions module.
 #[macro_use]

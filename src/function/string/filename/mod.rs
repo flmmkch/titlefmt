@@ -1,10 +1,13 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
-use std::path::{ Path };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 use std::ops::Deref;
+use std::path::Path;
 
-fn filename<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn filename<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() < 1 {
         return Err(Error::ArgumentError);
     }

@@ -1,6 +1,6 @@
-use ::function;
-use ::metadata;
-use super::{ FormatParser };
+use super::FormatParser;
+use function;
+use metadata;
 
 /// Title formatting context.
 pub struct Formatter<T: metadata::Provider> {
@@ -11,9 +11,7 @@ impl<T: metadata::Provider> Formatter<T> {
     /// Initialize a new formatting context with the standard functions.
     pub fn new() -> Formatter<T> {
         let functions = function::standard_functions();
-        Formatter {
-            functions,
-        }
+        Formatter { functions }
     }
     pub fn functions(&self) -> &Vec<Box<function::Function<T>>> {
         &self.functions

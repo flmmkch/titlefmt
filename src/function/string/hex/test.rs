@@ -1,15 +1,17 @@
-use ::{ test, Formatter };
 use std::collections::HashMap;
+use {test, Formatter};
 
 #[test]
-fn test_function_hex()
-{
+fn test_function_hex() {
     let formatter = Formatter::new();
     // tests with functions
     {
         let test_metadata = test::MetadataProvider::new(HashMap::new());
         let do_test = |input, expected| {
-            let expression = formatter.parser().parse(&format!("$hex({})", input)).unwrap();
+            let expression = formatter
+                .parser()
+                .parse(&format!("$hex({})", input))
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!(expected, s.to_string().as_str());
         };
@@ -31,7 +33,10 @@ fn test_function_hex()
         do_test("1E", "");
         do_test("EE", "");
         let do_test2 = |input, padding, expected| {
-            let expression = formatter.parser().parse(&format!("$hex({}, {})", input, padding)).unwrap();
+            let expression = formatter
+                .parser()
+                .parse(&format!("$hex({}, {})", input, padding))
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!(expected, s.to_string().as_str());
         };

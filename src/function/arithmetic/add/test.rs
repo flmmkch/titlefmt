@@ -1,9 +1,8 @@
-use ::{ test, Formatter };
 use std::collections::HashMap;
+use {test, Formatter};
 
 #[test]
-fn test_function_add()
-{
+fn test_function_add() {
     let formatter = Formatter::new();
     // tests with functions
     {
@@ -45,12 +44,18 @@ fn test_function_add()
             assert_eq!("2016", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$if($add(%title%,1),ok,no)").unwrap();
+            let expression = formatter
+                .parser()
+                .parse("$if($add(%title%,1),ok,no)")
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("ok", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$if($greater($add(%title%,1),1969),ok,no)").unwrap();
+            let expression = formatter
+                .parser()
+                .parse("$if($greater($add(%title%,1),1969),ok,no)")
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("ok", s.to_string().as_str());
         }

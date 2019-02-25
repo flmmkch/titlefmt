@@ -1,8 +1,8 @@
 // Parsing tests
-use super::{ Item, Expression };
-use ::Formatter;
+use super::{Expression, Item};
 use std::collections::HashMap;
-use ::test::MetadataProvider;
+use test::MetadataProvider;
+use Formatter;
 
 fn make_item_text(text: &str) -> Item<MetadataProvider> {
     Item::Text(text.to_owned())
@@ -121,13 +121,15 @@ fn test_apply_optional() {
     }
 }
 
-
 #[test]
 fn test_parsed() {
     let formatter = Formatter::new();
     // tests with optional expressions
     {
-        let expression = formatter.parser().parse("%tracknumber%. %title%[ (%composer%)]").unwrap();
+        let expression = formatter
+            .parser()
+            .parse("%tracknumber%. %title%[ (%composer%)]")
+            .unwrap();
         {
             let test_metadata = {
                 let mut dict = HashMap::new();
@@ -151,7 +153,10 @@ fn test_parsed() {
         }
     }
     {
-        let expression = formatter.parser().parse("%tracknumber%. %title%[ (%composer%)[ '['%testfield%']'] - hop]").unwrap();
+        let expression = formatter
+            .parser()
+            .parse("%tracknumber%. %title%[ (%composer%)[ '['%testfield%']'] - hop]")
+            .unwrap();
         {
             let test_metadata = {
                 let mut dict = HashMap::new();

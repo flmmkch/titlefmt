@@ -1,9 +1,8 @@
-use ::{ test, Formatter };
 use std::collections::HashMap;
+use {test, Formatter};
 
 #[test]
-fn test_function_mod()
-{
+fn test_function_mod() {
     let formatter = Formatter::new();
     // tests with functions
     {

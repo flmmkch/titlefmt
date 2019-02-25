@@ -1,4 +1,4 @@
-use super::{ Function, Error };
+use super::{Error, Function};
 
 /// Logical and
 pub mod and;

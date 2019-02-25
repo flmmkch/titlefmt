@@ -1,9 +1,8 @@
-use ::{ test, Formatter };
 use std::collections::HashMap;
+use {test, Formatter};
 
 #[test]
-fn test_function_abbr()
-{
+fn test_function_abbr() {
     let formatter = Formatter::new();
     // tests with functions
     {
@@ -14,12 +13,18 @@ fn test_function_abbr()
             assert_eq!("hw", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$abbr('Hunting & Gathering (Cydonia)')").unwrap();
+            let expression = formatter
+                .parser()
+                .parse("$abbr('Hunting & Gathering (Cydonia)')")
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("H&GC", s.to_string().as_str());
         }
         {
-            let expression = formatter.parser().parse("$abbr('21st Century Schizoid Man (including Mirrors)')").unwrap();
+            let expression = formatter
+                .parser()
+                .parse("$abbr('21st Century Schizoid Man (including Mirrors)')")
+                .unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("2CSMiM", s.to_string().as_str());
         }

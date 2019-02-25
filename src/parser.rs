@@ -1,8 +1,8 @@
-use nom::{self, IResult, alphanumeric, is_space};
+use super::expression;
+use super::metadata;
+use nom::{self, alphanumeric, is_space, IResult};
 use std::str;
 use std::string;
-use super::metadata;
-use super::expression;
 
 #[derive(Debug)]
 pub enum ParseError {
@@ -16,38 +16,53 @@ pub enum ParseError {
 
 /// Parsing a string: first parse into intermediate objects (building module)
 /// Then convert into real objects with the context
-pub fn parse<'a, 'b, T: metadata::Provider>(string: &str, format_parser: &super::FormatParser<'a, T>) -> Result<expression::Expression<'b, T>, ParseError>
-    where 'a: 'b {
+pub fn parse<'a, 'b, T: metadata::Provider>(
+    string: &str,
+    format_parser: &super::FormatParser<'a, T>,
+) -> Result<expression::Expression<'b, T>, ParseError>
+where
+    'a: 'b,
+{
     let result = parse_expression(string.as_bytes());
     match result {
         Ok((_, building_expr)) => {
             let real_expr = build_expression(building_expr, &format_parser)?;
             Ok(real_expr)
-        },
+        }
         Err(_) => Err(ParseError::NomError),
     }
 }
 
 /// Build the expression from the building plans that have been parsed, using the formatters' information (such as functions)
-fn build_expression<'a, 'b, T: metadata::Provider>(building_expr: building::Expression, format_parser: &super::FormatParser<'a, T>) -> Result<expression::Expression<'b, T>, ParseError>
-    where 'a: 'b {
+fn build_expression<'a, 'b, T: metadata::Provider>(
+    building_expr: building::Expression,
+    format_parser: &super::FormatParser<'a, T>,
+) -> Result<expression::Expression<'b, T>, ParseError>
+where
+    'a: 'b,
+{
     let mut real_items = Vec::new();
     for building_item in building_expr.items {
-        let s : expression::Item<T> = {
+        let s: expression::Item<T> = {
             match building_item {
                 building::Item::Text(v) => expression::Item::Text(v),
                 building::Item::Tag(v) => expression::Item::Tag(v),
                 building::Item::OptionalExpr(optional_building_expr) => {
-                    let optional_real_expr = build_expression(*optional_building_expr, &format_parser)?;
+                    let optional_real_expr =
+                        build_expression(*optional_building_expr, &format_parser)?;
                     expression::Item::OptionalExpr(Box::new(optional_real_expr))
-                },
+                }
                 building::Item::Function(building_function_call) => {
                     let function_call = {
                         let func = {
                             let lowercase_func_name = building_function_call.name.to_lowercase();
                             match format_parser.find_function(lowercase_func_name.as_str()) {
                                 Some(real_func) => real_func,
-                                None => return Err(ParseError::FunctionNotFound(building_function_call.name)),
+                                None => {
+                                    return Err(ParseError::FunctionNotFound(
+                                        building_function_call.name,
+                                    ))
+                                }
                             }
                         };
                         let mut real_args = Vec::new();
@@ -58,7 +73,7 @@ fn build_expression<'a, 'b, T: metadata::Provider>(building_expr: building::Expr
                         expression::FunctionCall::new(func, real_args)
                     };
                     expression::Item::Function(function_call)
-                },
+                }
             }
         };
         real_items.push(s)
@@ -229,10 +244,7 @@ named!(function_args<&[u8], Vec<building::Expression>>,
 
 fn make_function_item(func_call: (String, Vec<building::Expression>)) -> building::Item {
     let (name, arguments) = func_call;
-    let func_call = building::FunctionCall {
-        name,
-        arguments,
-    };
+    let func_call = building::FunctionCall { name, arguments };
     building::Item::Function(func_call)
 }
 
@@ -267,7 +279,7 @@ fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> bo
             Ok(text) => {
                 items.push(building::Item::Text(text));
                 current_text.clear();
-            },
+            }
             Err(_) => return false,
         }
     };
@@ -277,12 +289,18 @@ fn flush_text(current_text: &mut Vec<u8>, items: &mut Vec<building::Item>) -> bo
 macro_rules! flush_text {
     ($x:expr, $y:expr, $input:expr) => {
         if !flush_text($x, $y) {
-            return Err(nom::Err::Error(nom::Context::Code($input, nom::ErrorKind::Custom(1))));
+            return Err(nom::Err::Error(nom::Context::Code(
+                $input,
+                nom::ErrorKind::Custom(1),
+            )));
         };
-    }
+    };
 }
 
-fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8]) -> IResult<&'a [u8], building::Expression> {
+fn limited_expression_parser<'a>(
+    mut input: &'a [u8],
+    finishing_characters: &[u8],
+) -> IResult<&'a [u8], building::Expression> {
     let mut items: Vec<building::Item> = Vec::new();
     let mut current_text: Vec<u8> = Vec::new();
     'expression_loop: while input.len() > 0 {
@@ -296,21 +314,18 @@ fn limited_expression_parser<'a>(mut input: &'a [u8], finishing_characters: &[u8
                 input = input_remaining;
                 flush_text!(&mut current_text, &mut items, input);
                 items.push(new_item);
-            },
+            }
             _ => {
                 current_text.push(input[0]);
                 input = &input[1..];
-            },
+            }
         }
     }
     flush_text!(&mut current_text, &mut items, input);
-    let expression = building::Expression {
-        items,
-    };
+    let expression = building::Expression { items };
     Ok((input, expression))
 }
 
 fn parse_expression(input: &[u8]) -> IResult<&[u8], building::Expression> {
     limited_expression_parser(input, &[])
 }
-

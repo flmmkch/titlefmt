@@ -1,5 +1,5 @@
-use ::metadata;
-use ::expression::{ Expression, Evaluation };
+use expression::{Evaluation, Expression};
+use metadata;
 use std;
 
 /// Error encountered when applying a function.
@@ -44,66 +44,62 @@ macro_rules! function_object_maker {
         pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
             Function::new(
                 stringify!($func_name),
-                Box::new(|expressions: &[Box<Expression<T>>], provider: &T| -> Result<Evaluation, Error> { $func_name(expressions, provider) })
+                Box::new(
+                    |expressions: &[Box<Expression<T>>],
+                     provider: &T|
+                     -> Result<Evaluation, Error> { $func_name(expressions, provider) },
+                ),
             )
         }
-    }
+    };
 }
 
 #[macro_export]
 macro_rules! try_integer_result {
-    ($expression: expr, $provider: expr, $type: ty) => (
-        {
-            let eval = $expression.apply($provider);
-            let i_opt : Option<$type> = {
-                match eval.value() {
-                    &Value::Integer(term) => Some(term as $type),
-                    &Value::Double(term) => Some(term as $type),
-                    &Value::Text(ref s) => {
-                        match s.parse::<$type>() {
-                            Ok(term) => Some(term),
-                            _ => None,
-                        }
-                    }
+    ($expression: expr, $provider: expr, $type: ty) => {{
+        let eval = $expression.apply($provider);
+        let i_opt: Option<$type> = {
+            match eval.value() {
+                &Value::Integer(term) => Some(term as $type),
+                &Value::Double(term) => Some(term as $type),
+                &Value::Text(ref s) => match s.parse::<$type>() {
+                    Ok(term) => Some(term),
                     _ => None,
-                }
-            };
-            if let Some(i) = i_opt {
-                Some((i, eval.truth()))
+                },
+                _ => None,
             }
-            else {
-                None
-            }
+        };
+        if let Some(i) = i_opt {
+            Some((i, eval.truth()))
+        } else {
+            None
         }
-    );
-    ($expression: expr, $provider: expr) => (
+    }};
+    ($expression: expr, $provider: expr) => {
         try_integer_result!($expression, $provider, i32)
-    );
+    };
 }
 
 #[macro_export]
 macro_rules! expect_integer_result {
-    ($expression: expr, $provider: expr, $type: ty) => (
+    ($expression: expr, $provider: expr, $type: ty) => {
         match try_integer_result!($expression, $provider, $type) {
             Some(eval) => eval,
             None => return Err(Error::TypeError),
         }
-    );
-    ($expression: expr, $provider: expr) => (
+    };
+    ($expression: expr, $provider: expr) => {
         expect_integer_result!($expression, $provider, i32)
-    );
+    };
 }
 
 #[macro_export]
 macro_rules! expect_string_result {
-    ($expression: expr, $provider: expr) => (
-        {
-            let eval = $expression.apply($provider);
-            (eval.to_string(), eval.truth())
-        }
-    );
+    ($expression: expr, $provider: expr) => {{
+        let eval = $expression.apply($provider);
+        (eval.to_string(), eval.truth())
+    }};
 }
-
 
 /// Arithmetic functions
 mod arithmetic;
@@ -124,7 +120,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     macro_rules! add_function {
         ($func_name: ident) => {
             s.push(Box::new($func_name::make_function_object::<T>()));
-        }
+        };
     }
     // arithmetic functions
     add_function!(add);
@@ -171,7 +167,11 @@ impl<T: metadata::Provider> Function<T> {
             name: name_param.to_lowercase(),
         }
     }
-    pub fn apply(&self, arguments: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+    pub fn apply(
+        &self,
+        arguments: &[Box<Expression<T>>],
+        provider: &T,
+    ) -> Result<Evaluation, Error> {
         (self.closure)(&arguments, &provider)
     }
     pub fn name(&self) -> &str {

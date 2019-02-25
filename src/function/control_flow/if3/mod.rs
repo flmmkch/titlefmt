@@ -1,8 +1,11 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation };
+use super::{Error, Function};
+use expression::{Evaluation, Expression};
+use metadata;
 
-fn if3<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn if3<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() == 0 {
         return Err(Error::ArgumentError);
     }
@@ -13,7 +16,7 @@ fn if3<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) 
         }
     }
     // else
-    let else_value = expressions[expressions.len() - 1].apply(provider); 
+    let else_value = expressions[expressions.len() - 1].apply(provider);
     Ok(else_value)
 }
 

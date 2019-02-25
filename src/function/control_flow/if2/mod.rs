@@ -1,16 +1,18 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation };
+use super::{Error, Function};
+use expression::{Evaluation, Expression};
+use metadata;
 
-fn if2<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn if2<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() != 2 {
         return Err(Error::ArgumentError);
     }
     let eval = expressions[0].apply(provider);
     if eval.truth() {
         Ok(eval)
-    }
-    else {
+    } else {
         Ok(expressions[1].apply(provider))
     }
 }

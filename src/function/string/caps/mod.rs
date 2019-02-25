@@ -1,8 +1,11 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 
-fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn caps<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() != 1 {
         return Err(Error::ArgumentError);
     }
@@ -16,14 +19,14 @@ fn caps<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T)
                 (true, false) => {
                     result_chars.extend(c.to_uppercase());
                     caps_next_character = false;
-                    },
+                }
                 (false, false) => {
                     result_chars.extend(c.to_lowercase());
-                },
+                }
                 (_, true) => {
                     result_chars.extend(c.to_lowercase());
                     caps_next_character = true;
-                },
+                }
             }
         }
         result_chars.into_iter().collect()

@@ -1,8 +1,11 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 
-fn insert<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn insert<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() < 3 {
         return Err(Error::ArgumentError);
     }
@@ -12,8 +15,7 @@ fn insert<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &
     if let Some((n_bytes, _)) = text.char_indices().skip(n_chars).next() {
         text.insert_str(n_bytes, &inserted_string);
         Ok(Evaluation::new(Value::Text(text), truth && truth2))
-    }
-    else {
+    } else {
         Err(Error::ArgumentError)
     }
 }

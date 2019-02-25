@@ -1,10 +1,13 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
-use std::path::{ Path };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 use std::ops::Deref;
+use std::path::Path;
 
-fn directory_path<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn directory_path<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() < 1 {
         return Err(Error::ArgumentError);
     }
@@ -13,8 +16,7 @@ fn directory_path<T: metadata::Provider>(expressions: &[Box<Expression<T>>], pro
     let result_path = {
         if file_path.is_dir() {
             file_path
-        }
-        else {
+        } else {
             match file_path.parent() {
                 Some(dir) => dir,
                 None => Path::new("/"),

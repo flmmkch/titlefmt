@@ -12,8 +12,7 @@ impl<'a> metadata::Provider for MetadataProvider<'a> {
         if let Some(value) = entry {
             let s = value.to_string();
             Some(s)
-        }
-        else {
+        } else {
             None
         }
     }
@@ -21,8 +20,6 @@ impl<'a> metadata::Provider for MetadataProvider<'a> {
 
 impl<'a> MetadataProvider<'a> {
     pub fn new(metadata_dict: HashMap<&'a str, &'a str>) -> MetadataProvider<'a> {
-        MetadataProvider {
-            metadata_dict,
-        }
+        MetadataProvider { metadata_dict }
     }
 }

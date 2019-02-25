@@ -1,14 +1,16 @@
-use ::function;
-use ::metadata;
-use ::expression;
 use super::parser;
-use super::{ Formatter };
+use super::Formatter;
+use expression;
+use function;
+use metadata;
 
 use std::collections::HashMap;
 
 /// Title formatting parser, spawned from a `Formatter`.
 pub struct FormatParser<'a, T: metadata::Provider>
-    where T: 'a {
+where
+    T: 'a,
+{
     //formatter: &'a Formatter<T>,
     functions_map: HashMap<&'a str, &'a function::Function<T>>,
 }
@@ -20,7 +22,7 @@ impl<'a, T: metadata::Provider> FormatParser<'a, T> {
             functions_map.insert(func.name(), func.as_ref());
         }
         FormatParser {
-        //    formatter,
+            //    formatter,
             functions_map,
         }
     }
@@ -32,7 +34,10 @@ impl<'a, T: metadata::Provider> FormatParser<'a, T> {
         }
     }
     /// Parse a title formatting string into an `Expression` that can be applied on metadata providers.
-    pub fn parse<'b>(&'b self, string: &str) -> Result<expression::Expression<'a, T>, parser::ParseError> {
+    pub fn parse<'b>(
+        &'b self,
+        string: &str,
+    ) -> Result<expression::Expression<'a, T>, parser::ParseError> {
         Ok(parser::parse(string, &self)?)
     }
 }

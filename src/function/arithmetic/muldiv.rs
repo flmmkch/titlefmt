@@ -1,8 +1,11 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 
-fn muldiv<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn muldiv<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() != 3 {
         return Err(Error::ArgumentError);
     }
@@ -14,7 +17,10 @@ fn muldiv<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &
     }
     let (a, a_truth) = expect_integer_result!(&expressions[0], provider);
     let (b, b_truth) = expect_integer_result!(&expressions[1], provider);
-    Ok(Evaluation::new(Value::Integer((a * b) / c), a_truth | b_truth | c_truth))
+    Ok(Evaluation::new(
+        Value::Integer((a * b) / c),
+        a_truth | b_truth | c_truth,
+    ))
 }
 
 function_object_maker!(muldiv);

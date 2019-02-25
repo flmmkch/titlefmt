@@ -1,9 +1,12 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 
-fn add<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
-    let mut result : i32 = 0;
+fn add<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
+    let mut result: i32 = 0;
     let mut truth = false;
     for expr in expressions.iter() {
         if let Some((i, expr_truth)) = try_integer_result!(expr, provider) {

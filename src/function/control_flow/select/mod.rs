@@ -1,8 +1,11 @@
-use super::{ Function, Error };
-use ::metadata;
-use ::expression::{ Expression, Evaluation, Value };
+use super::{Error, Function};
+use expression::{Evaluation, Expression, Value};
+use metadata;
 
-fn select<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &T) -> Result<Evaluation, Error> {
+fn select<T: metadata::Provider>(
+    expressions: &[Box<Expression<T>>],
+    provider: &T,
+) -> Result<Evaluation, Error> {
     if expressions.len() == 0 {
         return Err(Error::ArgumentError);
     }
@@ -15,8 +18,7 @@ fn select<T: metadata::Provider>(expressions: &[Box<Expression<T>>], provider: &
         let len = value_expressions.len();
         if index < len {
             Ok(value_expressions[index].apply(provider))
-        }
-        else {
+        } else {
             Ok(Evaluation::new(Value::Empty, false))
         }
     }

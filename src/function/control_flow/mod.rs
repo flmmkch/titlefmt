@@ -1,4 +1,4 @@
-use super::{ Function, Error };
+use super::{Error, Function};
 
 /// if
 pub mod if_;
