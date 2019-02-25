@@ -160,6 +160,7 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(ext);
     add_function!(filename);
     add_function!(hex);
+    add_function!(insert);
     s
 }
 

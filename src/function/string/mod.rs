@@ -30,3 +30,6 @@ pub use self::filename::*;
 /// hex
 pub mod hex;
 pub use self::hex::*;
+/// insert
+pub mod insert;
+pub use self::insert::*;
