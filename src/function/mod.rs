@@ -147,6 +147,8 @@ pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
     add_function!(select);
     // string functions
     add_function!(abbr);
+    #[cfg(feature = "unicode-normalization")]
+    add_function!(ascii);
     add_function!(caps);
     add_function!(caps2);
     add_function!(crlf);

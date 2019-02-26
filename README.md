@@ -34,6 +34,7 @@ Example: `$ cargo run --release --bin titlefmtr "%track%. [%artist% - ] %title%"
   * iflonger
   * select
   * abbr
+  * ascii (if the `unicode-normalization` optional dependency is enabled, which is the default)
   * caps
   * caps2
   * crlf

@@ -3,6 +3,11 @@ use super::{Error, Function};
 /// abbr
 pub mod abbr;
 pub use self::abbr::*;
+/// ascii
+#[cfg(feature = "unicode-normalization")]
+pub mod ascii;
+#[cfg(feature = "unicode-normalization")]
+pub use self::ascii::*;
 /// caps
 pub mod caps;
 pub use self::caps::*;
