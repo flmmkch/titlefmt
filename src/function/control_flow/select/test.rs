@@ -10,6 +10,22 @@ fn test_function_select() {
         {
             let expression = formatter
                 .parser()
+                .parse("$select(1, one, two, three, four)")
+                .unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("one", s.to_string().as_str());
+        }
+        {
+            let expression = formatter
+                .parser()
+                .parse("$select(0, one, two, three, four)")
+                .unwrap();
+            let s = expression.apply(&test_metadata);
+            assert_eq!("", s.to_string().as_str());
+        }
+        {
+            let expression = formatter
+                .parser()
                 .parse("$select(2, one, two, three, four)")
                 .unwrap();
             let s = expression.apply(&test_metadata);
