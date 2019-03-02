@@ -12,7 +12,7 @@ pub fn iflonger<T: metadata::Provider>(
     let (string, _) = expect_string_result!(&expressions[0], provider);
     let (min_len, _) = expect_integer_result!(&expressions[1], provider, usize);
     let result = {
-        if string.len() > min_len {
+        if string.chars().count() > min_len {
             expressions[2].apply(provider)
         } else {
             expressions[3].apply(provider)
