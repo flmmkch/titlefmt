@@ -6,7 +6,6 @@ pub mod abbr;
 /// ascii
 #[cfg(feature = "unicode-normalization")]
 pub mod ascii;
-#[cfg(feature = "unicode-normalization")]
 
 /// caps
 pub mod caps;
