@@ -1,10 +1,10 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
-fn directory<T: metadata::Provider>(
+pub fn directory<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -46,8 +46,6 @@ fn directory<T: metadata::Provider>(
     };
     Ok(Evaluation::new(Value::Text(result_text), truth))
 }
-
-function_object_maker!(directory);
 
 #[cfg(test)]
 mod test;

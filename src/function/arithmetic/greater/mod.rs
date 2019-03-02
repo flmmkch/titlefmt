@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn greater<T: metadata::Provider>(
+pub fn greater<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -16,8 +16,6 @@ fn greater<T: metadata::Provider>(
     }
     Ok(Evaluation::new(Value::Empty, values[0] > values[1]))
 }
-
-function_object_maker!(greater);
 
 #[cfg(test)]
 mod test;

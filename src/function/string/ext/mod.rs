@@ -1,10 +1,10 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 use std::ops::Deref;
 use std::path::Path;
 
-fn ext<T: metadata::Provider>(
+pub fn ext<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -21,8 +21,6 @@ fn ext<T: metadata::Provider>(
     };
     Ok(Evaluation::new(Value::Text(result_text), truth))
 }
-
-function_object_maker!(ext);
 
 #[cfg(test)]
 mod test;

@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression};
 use metadata;
 
-fn if2<T: metadata::Provider>(
+pub fn if2<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -16,8 +16,6 @@ fn if2<T: metadata::Provider>(
         Ok(expressions[1].apply(provider))
     }
 }
-
-function_object_maker!(if2);
 
 #[cfg(test)]
 mod test;

@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn abbr<T: metadata::Provider>(
+pub fn abbr<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -46,8 +46,6 @@ fn abbr<T: metadata::Provider>(
         _ => Err(Error::ArgumentError),
     }
 }
-
-function_object_maker!(abbr);
 
 #[cfg(test)]
 mod test;

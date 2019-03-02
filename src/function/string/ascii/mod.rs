@@ -1,9 +1,9 @@
 extern crate unicode_normalization;
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn ascii<T: metadata::Provider>(
+pub fn ascii<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -15,12 +15,11 @@ fn ascii<T: metadata::Provider>(
         .chars()
         .flat_map(|c| {
             let mut normalized_chars = Vec::new();
-            unicode_normalization::char::decompose_canonical(c, |n_c|
-                {
-                    if n_c.is_ascii() {
-                        normalized_chars.push(n_c)
-                    }
-                });
+            unicode_normalization::char::decompose_canonical(c, |n_c| {
+                if n_c.is_ascii() {
+                    normalized_chars.push(n_c)
+                }
+            });
             if normalized_chars.is_empty() {
                 normalized_chars.push('?');
             }
@@ -29,8 +28,6 @@ fn ascii<T: metadata::Provider>(
         .collect();
     Ok(Evaluation::new(Value::Text(text), truth))
 }
-
-function_object_maker!(ascii);
 
 #[cfg(test)]
 mod test;

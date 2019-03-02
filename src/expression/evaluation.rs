@@ -2,6 +2,8 @@ use super::Value;
 use std::fmt;
 
 /// Result of a a complete or partial evaluation of a title formatting expression.
+/// An Evaluation holds a result value, as well as a truth boolean used for sub-expressions between square brackets [].
+/// If a sub-expression receives true as a truth value, then it will appear in the result. If the truth value is to false, then it will be hidden.
 #[derive(Clone)]
 pub struct Evaluation {
     value: Value,

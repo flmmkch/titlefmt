@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn not<T: metadata::Provider>(
+pub fn not<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -12,5 +12,3 @@ fn not<T: metadata::Provider>(
     let result = !expressions[0].apply(provider).truth();
     Ok(Evaluation::new(Value::Empty, result))
 }
-
-function_object_maker!(not);

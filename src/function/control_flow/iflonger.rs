@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn iflonger<T: metadata::Provider>(
+pub fn iflonger<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -20,5 +20,3 @@ fn iflonger<T: metadata::Provider>(
     };
     Ok(result)
 }
-
-function_object_maker!(iflonger);

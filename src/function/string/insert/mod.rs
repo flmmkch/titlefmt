@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn insert<T: metadata::Provider>(
+pub fn insert<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -19,8 +19,6 @@ fn insert<T: metadata::Provider>(
         Err(Error::ArgumentError)
     }
 }
-
-function_object_maker!(insert);
 
 #[cfg(test)]
 mod test;

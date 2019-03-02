@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn muldiv<T: metadata::Provider>(
+pub fn muldiv<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -22,5 +22,3 @@ fn muldiv<T: metadata::Provider>(
         a_truth | b_truth | c_truth,
     ))
 }
-
-function_object_maker!(muldiv);

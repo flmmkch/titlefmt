@@ -1,10 +1,10 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
 use std::cmp;
 
-fn min<T: metadata::Provider>(
+pub fn min<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -21,8 +21,6 @@ fn min<T: metadata::Provider>(
     }
     Ok(Evaluation::new(Value::Integer(result), truth))
 }
-
-function_object_maker!(min);
 
 #[cfg(test)]
 mod test;

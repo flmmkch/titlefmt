@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn caps2<T: metadata::Provider>(
+pub fn caps2<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -33,8 +33,6 @@ fn caps2<T: metadata::Provider>(
     };
     Ok(Evaluation::new(Value::Text(result_text), truth))
 }
-
-function_object_maker!(caps2);
 
 #[cfg(test)]
 mod test;

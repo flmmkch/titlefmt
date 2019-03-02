@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn mod_<T: metadata::Provider>(
+pub fn mod_<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -19,17 +19,6 @@ fn mod_<T: metadata::Provider>(
         }
     }
     Ok(Evaluation::new(Value::Integer(result), truth))
-}
-
-pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
-    Function::new(
-        "mod",
-        Box::new(
-            |expressions: &[Box<Expression<T>>], provider: &T| -> Result<Evaluation, Error> {
-                mod_(expressions, provider)
-            },
-        ),
-    )
 }
 
 #[cfg(test)]

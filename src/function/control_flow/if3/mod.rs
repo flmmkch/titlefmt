@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression};
 use metadata;
 
-fn if3<T: metadata::Provider>(
+pub fn if3<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -19,8 +19,6 @@ fn if3<T: metadata::Provider>(
     let else_value = expressions[expressions.len() - 1].apply(provider);
     Ok(else_value)
 }
-
-function_object_maker!(if3);
 
 #[cfg(test)]
 mod test;

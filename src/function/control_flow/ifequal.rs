@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn ifequal<T: metadata::Provider>(
+pub fn ifequal<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -23,5 +23,3 @@ fn ifequal<T: metadata::Provider>(
     };
     Ok(result)
 }
-
-function_object_maker!(ifequal);

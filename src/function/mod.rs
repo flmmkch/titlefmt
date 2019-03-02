@@ -39,21 +39,7 @@ pub struct Function<T: metadata::Provider> {
     name: String,
 }
 
-macro_rules! function_object_maker {
-    ($func_name: ident) => {
-        pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
-            Function::new(
-                stringify!($func_name),
-                Box::new(
-                    |expressions: &[Box<Expression<T>>],
-                     provider: &T|
-                     -> Result<Evaluation, Error> { $func_name(expressions, provider) },
-                ),
-            )
-        }
-    };
-}
-
+/// Get the integer result for a sub-expression and return an Option<T> where T is the integer type. If no type is given, then i32 is assumed.
 #[macro_export]
 macro_rules! try_integer_result {
     ($expression: expr, $provider: expr, $type: ty) => {{
@@ -80,6 +66,7 @@ macro_rules! try_integer_result {
     };
 }
 
+/// Get the integer result for a sub-expression or return an error.
 #[macro_export]
 macro_rules! expect_integer_result {
     ($expression: expr, $provider: expr, $type: ty) => {
@@ -93,6 +80,7 @@ macro_rules! expect_integer_result {
     };
 }
 
+/// Get the string result for a sub-expression or return an error.
 #[macro_export]
 macro_rules! expect_string_result {
     ($expression: expr, $provider: expr) => {{
@@ -101,72 +89,94 @@ macro_rules! expect_string_result {
     }};
 }
 
+/// Make a new Function from a function, using the name of the argument provided as its name.
+#[macro_export]
+macro_rules! make_function_object {
+    ($($function_part:ident)::*, $func_name:expr) => {
+        Function::new(
+            String::from($func_name),
+            Box::new(
+                |expressions,
+                    provider|
+                    -> Result<Evaluation, Error> { $($function_part)::*(expressions, provider) },
+            ),
+        )
+    };
+    ($($function_part:ident)::*) => {{
+        let mut _function_name: &'static str;
+        $(
+            _function_name = stringify!($function_part);
+        )*
+        make_function_object!($($function_part)::*, _function_name)
+    }};
+}
+
 /// Arithmetic functions
-mod arithmetic;
-use self::arithmetic::*;
-/// Boolean functions
-mod logical;
-use self::logical::*;
+pub mod arithmetic;
 /// Control flow functions
-mod control_flow;
-use self::control_flow::*;
+pub mod control_flow;
+/// Boolean functions
+pub mod logical;
 // String functions
-mod string;
-use self::string::*;
+pub mod string;
 
 /// Initialize a list of the standard functions defined in title formatting.
-pub fn standard_functions<T: metadata::Provider>() -> Vec<Box<Function<T>>> {
-    let mut s = Vec::new();
+pub fn standard_functions<T: metadata::Provider>() -> impl Iterator<Item = Function<T>> {
     macro_rules! add_function {
-        ($func_name: ident) => {
-            s.push(Box::new($func_name::make_function_object::<T>()));
+        ($previous_iterator:expr, $($($argument:tt)::*),*) => {
+            $previous_iterator.chain(Some(make_function_object!($($($argument)::*),*)))
+        };
+        ($($($argument:tt)::*),*) => {
+            Some(make_function_object!($($($argument)::*),*)).into_iter()
         };
     }
     // arithmetic functions
-    add_function!(add);
-    add_function!(div);
-    add_function!(greater);
-    add_function!(max);
-    add_function!(min);
-    s.push(Box::new(mod_::make_function_object::<T>()));
-    add_function!(mul);
-    add_function!(muldiv);
-    add_function!(sub);
+    let result_iterator = add_function!(arithmetic::add::add);
+    let result_iterator = add_function!(result_iterator, arithmetic::div::div);
+    let result_iterator = add_function!(result_iterator, arithmetic::greater::greater);
+    let result_iterator = add_function!(result_iterator, arithmetic::max::max);
+    let result_iterator = add_function!(result_iterator, arithmetic::min::min);
+    let result_iterator = add_function!(result_iterator, arithmetic::mod_::mod_, "mod");
+    let result_iterator = add_function!(result_iterator, arithmetic::mul::mul);
+    let result_iterator = add_function!(result_iterator, arithmetic::muldiv::muldiv);
+    let result_iterator = add_function!(result_iterator, arithmetic::sub::sub);
     // logical boolean functions
-    add_function!(and);
-    add_function!(or);
-    add_function!(not);
-    add_function!(xor);
+    let result_iterator = add_function!(result_iterator, logical::and::and);
+    let result_iterator = add_function!(result_iterator, logical::or::or);
+    let result_iterator = add_function!(result_iterator, logical::not::not);
+    let result_iterator = add_function!(result_iterator, logical::xor::xor);
     // control flow functions
-    s.push(Box::new(if_::make_function_object::<T>()));
-    add_function!(if2);
-    add_function!(if3);
-    add_function!(ifequal);
-    add_function!(ifgreater);
-    add_function!(iflonger);
-    add_function!(select);
+    let result_iterator = add_function!(result_iterator, control_flow::if_::if_, "if");
+    let result_iterator = add_function!(result_iterator, control_flow::if2::if2);
+    let result_iterator = add_function!(result_iterator, control_flow::if3::if3);
+    let result_iterator = add_function!(result_iterator, control_flow::ifequal::ifequal);
+    let result_iterator = add_function!(result_iterator, control_flow::ifgreater::ifgreater);
+    let result_iterator = add_function!(result_iterator, control_flow::iflonger::iflonger);
+    let result_iterator = add_function!(result_iterator, control_flow::select::select);
     // string functions
-    add_function!(abbr);
+    let result_iterator = add_function!(result_iterator, string::abbr::abbr);
     #[cfg(feature = "unicode-normalization")]
-    add_function!(ascii);
-    add_function!(caps);
-    add_function!(caps2);
-    add_function!(crlf);
-    add_function!(cut);
-    add_function!(directory);
-    add_function!(directory_path);
-    add_function!(ext);
-    add_function!(filename);
-    add_function!(hex);
-    add_function!(insert);
-    s
+    let result_iterator = add_function!(result_iterator, string::ascii::ascii);
+    let result_iterator = add_function!(result_iterator, string::caps::caps);
+    let result_iterator = add_function!(result_iterator, string::caps2::caps2);
+    let result_iterator = add_function!(result_iterator, string::left::left, "cut");
+    let result_iterator = add_function!(result_iterator, string::directory::directory);
+    let result_iterator = add_function!(result_iterator, string::directory_path::directory_path);
+    let result_iterator = add_function!(result_iterator, string::ext::ext);
+    let result_iterator = add_function!(result_iterator, string::filename::filename);
+    let result_iterator = add_function!(result_iterator, string::hex::hex);
+    let result_iterator = add_function!(result_iterator, string::insert::insert);
+    let result_iterator = add_function!(result_iterator, string::left::left);
+    let result_iterator = add_function!(result_iterator, string::right::right);
+    let result_iterator = add_function!(result_iterator, string::substr::substr);
+    result_iterator
 }
 
 impl<T: metadata::Provider> Function<T> {
-    pub fn new(name_param: &str, closure: Box<FunctionClosure<T>>) -> Function<T> {
+    pub fn new(name_param: String, closure: Box<FunctionClosure<T>>) -> Function<T> {
         Function {
             closure,
-            name: name_param.to_lowercase(),
+            name: name_param,
         }
     }
     pub fn apply(

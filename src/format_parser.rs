@@ -19,7 +19,7 @@ impl<'a, T: metadata::Provider> FormatParser<'a, T> {
     pub fn new(formatter: &'a Formatter<T>) -> FormatParser<'a, T> {
         let mut functions_map = HashMap::new();
         for func in formatter.functions().iter() {
-            functions_map.insert(func.name(), func.as_ref());
+            functions_map.insert(func.name(), func);
         }
         FormatParser {
             //    formatter,

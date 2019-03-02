@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn if_<T: metadata::Provider>(
+pub fn if_<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -20,17 +20,6 @@ fn if_<T: metadata::Provider>(
             _ => Err(Error::ArgumentError),
         }
     }
-}
-
-pub fn make_function_object<T: metadata::Provider>() -> Function<T> {
-    Function::new(
-        "if",
-        Box::new(
-            |expressions: &[Box<Expression<T>>], provider: &T| -> Result<Evaluation, Error> {
-                if_(expressions, provider)
-            },
-        ),
-    )
 }
 
 #[cfg(test)]

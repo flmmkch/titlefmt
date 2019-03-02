@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn ifgreater<T: metadata::Provider>(
+pub fn ifgreater<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -23,5 +23,3 @@ fn ifgreater<T: metadata::Provider>(
     };
     Ok(result)
 }
-
-function_object_maker!(ifgreater);

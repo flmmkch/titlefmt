@@ -1,8 +1,8 @@
-use super::{Error, Function};
+use super::Error;
 use expression::{Evaluation, Expression, Value};
 use metadata;
 
-fn select<T: metadata::Provider>(
+pub fn select<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],
     provider: &T,
 ) -> Result<Evaluation, Error> {
@@ -23,8 +23,6 @@ fn select<T: metadata::Provider>(
         }
     }
 }
-
-function_object_maker!(select);
 
 #[cfg(test)]
 mod test;
