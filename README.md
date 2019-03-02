@@ -8,6 +8,9 @@ To try out the formatting features, an example is included with the `titlefmtr` 
 
 Example: `$ cargo run --release --bin titlefmtr "%track%. [%artist% - ] %title%" test01.flac test02.mp3 music/**/*.flac`
 
+[![Build Status](https://travis-ci.org/suntorvic/titlefmt.svg?branch=master)](https://travis-ci.org/suntorvic/titlefmt)
+[![](https://meritbadge.herokuapp.com/titlefmt)](https://crates.io/crates/titlefmt)
+
 ## Usage
 
 Add this to your `Cargo.toml`:
