@@ -47,7 +47,6 @@ macro_rules! try_integer_result {
         let i_opt: Option<$type> = {
             match eval.value() {
                 &Value::Integer(term) => Some(term as $type),
-                &Value::Double(term) => Some(term as $type),
                 &Value::Text(ref s) => match s.parse::<$type>() {
                     Ok(term) => Some(term),
                     _ => None,
