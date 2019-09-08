@@ -1,5 +1,5 @@
+use crate::{test, Formatter};
 use std::collections::HashMap;
-use {test, Formatter};
 
 #[test]
 fn test_function_caps() {
@@ -18,10 +18,7 @@ fn test_function_caps() {
             assert_eq!("Ça T'étonne?", s.to_string().as_str());
         }
         {
-            let expression = formatter
-                .parser()
-                .parse("$caps(ÇA T''ÉTONNE ね?)")
-                .unwrap();
+            let expression = formatter.parser().parse("$caps(ÇA T''ÉTONNE ね?)").unwrap();
             let s = expression.apply(&test_metadata);
             assert_eq!("Ça T'étonne ね?", s.to_string().as_str());
         }

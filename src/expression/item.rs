@@ -1,5 +1,5 @@
 use super::{Expression, FunctionCall};
-use metadata;
+use crate::metadata;
 
 /// An item of a formatting expression.
 pub enum Item<'a, T: metadata::Provider>

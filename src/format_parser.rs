@@ -1,8 +1,6 @@
 use super::parser;
 use super::Formatter;
-use expression;
-use function;
-use metadata;
+use crate::{expression, function, metadata};
 
 use std::collections::HashMap;
 

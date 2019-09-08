@@ -1,6 +1,6 @@
 use super::Error;
-use expression::{Evaluation, Expression, Value};
-use metadata;
+use crate::expression::{Evaluation, Expression, Value};
+use crate::metadata;
 
 pub fn mod_<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],

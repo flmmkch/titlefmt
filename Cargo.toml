@@ -15,6 +15,7 @@ include = [
     "README.md",
     ".travis.yml",
 ]
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "suntorvic/titlefmt", branch = "master" }

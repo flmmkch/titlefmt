@@ -1,5 +1,5 @@
+use crate::{test, Formatter};
 use std::collections::HashMap;
-use {test, Formatter};
 
 #[test]
 fn test_function_insert() {
@@ -26,11 +26,6 @@ fn test_function_insert() {
         );
         do_test("HELLO TEST", "THIS IS JUST A ", 30, "");
         do_test("HELLO TEST", "THIS IS JUST A ", -16, "");
-        do_test(
-            "今日はさよなら",
-            "今晩は",
-            3,
-            "今日は今晩はさよなら",
-        );
+        do_test("今日はさよなら", "今晩は", 3, "今日は今晩はさよなら");
     }
 }

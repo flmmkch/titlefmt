@@ -1,6 +1,6 @@
 use super::FormatParser;
-use function;
-use metadata;
+use crate::function;
+use crate::metadata;
 
 /// Title formatting context.
 pub struct Formatter<T: metadata::Provider> {

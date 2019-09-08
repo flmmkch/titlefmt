@@ -1,6 +1,5 @@
-use expression::{Evaluation, Expression};
-use metadata;
-use std;
+use crate::expression::{Evaluation, Expression};
+use crate::metadata;
 
 /// Error encountered when applying a function.
 #[derive(Debug)]
@@ -23,13 +22,13 @@ impl std::error::Error for Error {
         }
     }
 
-    fn cause(&self) -> Option<&std::error::Error> {
+    fn cause(&self) -> Option<&dyn std::error::Error> {
         None
     }
 }
 
 /// Generic type for function trait objects.
-pub type FunctionClosure<T> = Fn(&[Box<Expression<T>>], &T) -> Result<Evaluation, Error>;
+pub type FunctionClosure<T> = dyn Fn(&[Box<Expression<T>>], &T) -> Result<Evaluation, Error>;
 
 /// Definition of a function that can be used in expressions.
 pub struct Function<T: metadata::Provider> {

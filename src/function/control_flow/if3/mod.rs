@@ -1,6 +1,6 @@
 use super::Error;
-use expression::{Evaluation, Expression};
-use metadata;
+use crate::expression::{Evaluation, Expression};
+use crate::metadata;
 
 pub fn if3<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],

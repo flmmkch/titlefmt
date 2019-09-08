@@ -1,6 +1,6 @@
 use super::Error;
-use expression::{Evaluation, Expression, Value};
-use metadata;
+use crate::expression::{Evaluation, Expression, Value};
+use crate::metadata;
 
 pub fn ifequal<T: metadata::Provider>(
     expressions: &[Box<Expression<T>>],

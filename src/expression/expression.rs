@@ -1,5 +1,5 @@
 use super::{Evaluation, Item, Value};
-use metadata;
+use crate::metadata;
 
 /// A title formatting expression.
 pub struct Expression<'a, T: metadata::Provider>

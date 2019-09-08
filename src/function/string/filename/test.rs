@@ -1,5 +1,5 @@
+use crate::{test, Formatter};
 use std::collections::HashMap;
-use {test, Formatter};
 
 #[test]
 fn test_function_ext() {

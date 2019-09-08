@@ -1,6 +1,6 @@
 use super::Error;
-use expression::{Evaluation, Expression, Value};
-use metadata;
+use crate::expression::{Evaluation, Expression, Value};
+use crate::metadata;
 
 /// XOR operation
 /// test if an odd number of arguments evaluate to true

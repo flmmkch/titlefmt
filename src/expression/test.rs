@@ -1,8 +1,8 @@
 // Parsing tests
 use super::{Expression, Item};
+use crate::test::MetadataProvider;
+use crate::Formatter;
 use std::collections::HashMap;
-use test::MetadataProvider;
-use Formatter;
 
 fn make_item_text(text: &str) -> Item<MetadataProvider> {
     Item::Text(text.to_owned())

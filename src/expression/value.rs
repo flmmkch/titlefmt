@@ -1,5 +1,5 @@
-use std::fmt;
 use std::borrow::Cow;
+use std::fmt;
 
 /// A value corresponding to a complete or partial evaluation of a title formatting expression.
 #[derive(Clone)]

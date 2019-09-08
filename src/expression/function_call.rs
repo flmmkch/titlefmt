@@ -1,5 +1,5 @@
 use super::{Evaluation, Expression};
-use {function, metadata};
+use crate::{function, metadata};
 
 /// A function call.
 pub struct FunctionCall<'a, T: metadata::Provider>
